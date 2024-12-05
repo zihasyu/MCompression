@@ -562,3 +562,54 @@ void AbsMethod::Version_log(double time, double chunktime)
     preuniquechunkSize = uniquechunkSize;
     preSFTime = SFTime;
 }
+void AbsMethod::Migratory() {};
+void AbsMethod::MLC() {};
+void AbsMethod::OriLC(const std::string &inputFilePath)
+{
+    // 打开输入文件
+    std::ifstream inputFile(inputFilePath, std::ios::binary | std::ios::ate);
+    if (!inputFile.is_open())
+    {
+        std::cerr << "Unable to open input file: " << inputFilePath << std::endl;
+        return;
+    }
+
+    // 获取文件大小
+    std::streamsize inputSize = inputFile.tellg();
+    inputFile.seekg(0, std::ios::beg);
+
+    // 读取文件内容到缓冲区
+    std::vector<char> inputBuffer(inputSize);
+    if (!inputFile.read(inputBuffer.data(), inputSize))
+    {
+        std::cerr << "Error reading input file: " << inputFilePath << std::endl;
+        return;
+    }
+    inputFile.close();
+
+    // 分配缓冲区用于压缩
+    int maxCompressedSize = LZ4_compressBound(inputSize);
+    std::vector<char> compressedBuffer(maxCompressedSize);
+
+    // 进行压缩
+    int compressedSize = LZ4_compress_fast(inputBuffer.data(), compressedBuffer.data(), inputSize, maxCompressedSize, 3);
+
+    // 构造输出文件路径
+    std::string outputFilePath = "ori.lz4";
+
+    // 打开输出文件
+    std::ofstream outputFile(outputFilePath, std::ios::binary);
+    if (!outputFile.is_open())
+    {
+        std::cerr << "Unable to open output file: " << outputFilePath << std::endl;
+        return;
+    }
+
+    // 将压缩后的数据写入文件
+    outputFile.write(compressedBuffer.data(), compressedSize);
+    outputFile.close();
+
+    std::cout << "Compression successful. Output file: " << outputFilePath << std::endl;
+
+    return;
+}

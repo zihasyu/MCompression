@@ -1,0 +1,78 @@
+{
+    "sourceFile": "include/absmethod.h",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 15,
+            "patches": [
+                {
+                    "date": 1733385470535,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1733385499417,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -94,9 +94,9 @@\n     uint64_t LocalReduct = 0;\n     // LocalReduct+=tmpChunk.chunkSize-tmpChunk.saveSize;\n     uint64_t LocalityReduct = 0;\n     uint64_t FeatureReduct = 0;\n-    unordered_map<long long> hashTable;\n+    unordered_map<long long, uint64_t> hashTable;\n \n     AbsMethod();\n     ~AbsMethod();\n     void SetFilename(string name);\n"
+                },
+                {
+                    "date": 1733385786407,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -100,8 +100,9 @@\n     AbsMethod();\n     ~AbsMethod();\n     void SetFilename(string name);\n     virtual void ProcessTrace() = 0;\n+    void Migratory();\n     void SetInputMQ(MessageQueue<Chunk_t> *mq) { recieveQueue = mq; }\n     // void SetInputMaskMQ(MessageQueue<uint64_t> *mq) { MaskRecieveQueue = mq; }\n     //  void SetOutputMQ(MessageQueue<Chunk_t> *outputMQ)\n     //  {\n"
+                },
+                {
+                    "date": 1733386008057,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -94,9 +94,9 @@\n     uint64_t LocalReduct = 0;\n     // LocalReduct+=tmpChunk.chunkSize-tmpChunk.saveSize;\n     uint64_t LocalityReduct = 0;\n     uint64_t FeatureReduct = 0;\n-    unordered_map<long long, uint64_t> hashTable;\n+    unordered_map<long long, vector<uint64_t>> hashTable;\n \n     AbsMethod();\n     ~AbsMethod();\n     void SetFilename(string name);\n"
+                },
+                {
+                    "date": 1733386045529,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -94,9 +94,9 @@\n     uint64_t LocalReduct = 0;\n     // LocalReduct+=tmpChunk.chunkSize-tmpChunk.saveSize;\n     uint64_t LocalityReduct = 0;\n     uint64_t FeatureReduct = 0;\n-    unordered_map<long long, vector<uint64_t>> hashTable;\n+    unordered_map<long long, vector<Chunk_t>> hashTable;\n \n     AbsMethod();\n     ~AbsMethod();\n     void SetFilename(string name);\n"
+                },
+                {
+                    "date": 1733386064116,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -125,5 +125,6 @@\n     virtual void Version_log(double time);\n     virtual void Version_log(double time, double chunktime);\n     void SetTime(std::chrono::time_point<std::chrono::high_resolution_clock> &atime);\n };\n+\n #endif\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1733386307013,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -101,8 +101,9 @@\n     ~AbsMethod();\n     void SetFilename(string name);\n     virtual void ProcessTrace() = 0;\n     void Migratory();\n+    void Migratory();\n     void SetInputMQ(MessageQueue<Chunk_t> *mq) { recieveQueue = mq; }\n     // void SetInputMaskMQ(MessageQueue<uint64_t> *mq) { MaskRecieveQueue = mq; }\n     //  void SetOutputMQ(MessageQueue<Chunk_t> *outputMQ)\n     //  {\n"
+                },
+                {
+                    "date": 1733386332360,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -101,9 +101,9 @@\n     ~AbsMethod();\n     void SetFilename(string name);\n     virtual void ProcessTrace() = 0;\n     void Migratory();\n-    void Migratory();\n+    void MLC();\n     void SetInputMQ(MessageQueue<Chunk_t> *mq) { recieveQueue = mq; }\n     // void SetInputMaskMQ(MessageQueue<uint64_t> *mq) { MaskRecieveQueue = mq; }\n     //  void SetOutputMQ(MessageQueue<Chunk_t> *outputMQ)\n     //  {\n"
+                },
+                {
+                    "date": 1733387751834,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -100,10 +100,10 @@\n     AbsMethod();\n     ~AbsMethod();\n     void SetFilename(string name);\n     virtual void ProcessTrace() = 0;\n-    void Migratory();\n-    void MLC();\n+    virtual void Migratory();\n+    virtual void MLC();\n     void SetInputMQ(MessageQueue<Chunk_t> *mq) { recieveQueue = mq; }\n     // void SetInputMaskMQ(MessageQueue<uint64_t> *mq) { MaskRecieveQueue = mq; }\n     //  void SetOutputMQ(MessageQueue<Chunk_t> *outputMQ)\n     //  {\n"
+                },
+                {
+                    "date": 1733387844115,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -102,8 +102,9 @@\n     void SetFilename(string name);\n     virtual void ProcessTrace() = 0;\n     virtual void Migratory();\n     virtual void MLC();\n+    virtual void OriLC();\n     void SetInputMQ(MessageQueue<Chunk_t> *mq) { recieveQueue = mq; }\n     // void SetInputMaskMQ(MessageQueue<uint64_t> *mq) { MaskRecieveQueue = mq; }\n     //  void SetOutputMQ(MessageQueue<Chunk_t> *outputMQ)\n     //  {\n"
+                },
+                {
+                    "date": 1733388037619,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -102,9 +102,9 @@\n     void SetFilename(string name);\n     virtual void ProcessTrace() = 0;\n     virtual void Migratory();\n     virtual void MLC();\n-    virtual void OriLC();\n+    virtual void OriLC(string inputFile);\n     void SetInputMQ(MessageQueue<Chunk_t> *mq) { recieveQueue = mq; }\n     // void SetInputMaskMQ(MessageQueue<uint64_t> *mq) { MaskRecieveQueue = mq; }\n     //  void SetOutputMQ(MessageQueue<Chunk_t> *outputMQ)\n     //  {\n"
+                },
+                {
+                    "date": 1733388043935,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -102,9 +102,9 @@\n     void SetFilename(string name);\n     virtual void ProcessTrace() = 0;\n     virtual void Migratory();\n     virtual void MLC();\n-    virtual void OriLC(string inputFile);\n+    virtual void OriLC(string inputFilePath);\n     void SetInputMQ(MessageQueue<Chunk_t> *mq) { recieveQueue = mq; }\n     // void SetInputMaskMQ(MessageQueue<uint64_t> *mq) { MaskRecieveQueue = mq; }\n     //  void SetOutputMQ(MessageQueue<Chunk_t> *outputMQ)\n     //  {\n"
+                },
+                {
+                    "date": 1733388099049,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -102,9 +102,9 @@\n     void SetFilename(string name);\n     virtual void ProcessTrace() = 0;\n     virtual void Migratory();\n     virtual void MLC();\n-    virtual void OriLC(string inputFilePath);\n+    virtual void OriLC(const std::string &inputFilePath);\n     void SetInputMQ(MessageQueue<Chunk_t> *mq) { recieveQueue = mq; }\n     // void SetInputMaskMQ(MessageQueue<uint64_t> *mq) { MaskRecieveQueue = mq; }\n     //  void SetOutputMQ(MessageQueue<Chunk_t> *outputMQ)\n     //  {\n"
+                },
+                {
+                    "date": 1733388226151,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -102,9 +102,9 @@\n     void SetFilename(string name);\n     virtual void ProcessTrace() = 0;\n     virtual void Migratory();\n     virtual void MLC();\n-    virtual void OriLC(const std::string &inputFilePath);\n+    void OriLC(const std::string &inputFilePath);\n     void SetInputMQ(MessageQueue<Chunk_t> *mq) { recieveQueue = mq; }\n     // void SetInputMaskMQ(MessageQueue<uint64_t> *mq) { MaskRecieveQueue = mq; }\n     //  void SetOutputMQ(MessageQueue<Chunk_t> *outputMQ)\n     //  {\n"
+                },
+                {
+                    "date": 1733389526924,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -94,9 +94,9 @@\n     uint64_t LocalReduct = 0;\n     // LocalReduct+=tmpChunk.chunkSize-tmpChunk.saveSize;\n     uint64_t LocalityReduct = 0;\n     uint64_t FeatureReduct = 0;\n-    unordered_map<long long, vector<Chunk_t>> hashTable;\n+    map<long long, vector<Chunk_t>> hashTable;\n \n     AbsMethod();\n     ~AbsMethod();\n     void SetFilename(string name);\n"
+                },
+                {
+                    "date": 1733389781958,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -95,8 +95,9 @@\n     // LocalReduct+=tmpChunk.chunkSize-tmpChunk.saveSize;\n     uint64_t LocalityReduct = 0;\n     uint64_t FeatureReduct = 0;\n     map<long long, vector<Chunk_t>> hashTable;\n+    std::vector<long long> insertionOrder; // 记录插入顺序的键\n \n     AbsMethod();\n     ~AbsMethod();\n     void SetFilename(string name);\n"
+                }
+            ],
+            "date": 1733385470535,
+            "name": "Commit-0",
+            "content": "#ifndef ABS_METHOD_H\n#define ABS_METHOD_H\n\n#include <string>\n#include <chrono>\n#include \"define.h\"\n#include \"chunker.h\"\n#include \"lz4.h\"\n#include \"datawrite.h\"\n\nextern \"C\"\n{\n#include \"./config.h\"\n#include \"./xdelta3.h\"\n}\n\nusing namespace std;\n\nclass AbsMethod\n{\nprotected:\npublic:\n    int ads_Version = 0;\n    // util\n    string filename;\n    dataWrite *dataWrite_;\n    uint8_t *lz4ChunkBuffer;\n    uint8_t *hashBuf;\n    uint8_t *deltaMaxChunkBuffer;\n    EVP_MD_CTX *mdCtx;\n    // statics\n    uint64_t totalLogicalSize = 0;\n    uint64_t totalCompressedSize = 0;\n    uint64_t logicalchunkNum = 0;\n    uint64_t uniquechunkNum = 0;\n    uint64_t basechunkNum = 0;\n    uint64_t deltachunkNum = 0;\n    uint64_t bugCount = 0;\n    uint64_t finessehit = 0;\n    double DCESum = 0;\n    uint64_t SFnum = 0;\n    // SF time statics\n    std::chrono::time_point<std::chrono::high_resolution_clock> startSF, endSF;\n    std::chrono::duration<double> preSFTime;\n    std::chrono::duration<double> SFTime;\n    // time breakdown\n\n    std::chrono::time_point<std::chrono::high_resolution_clock> startDedup, endDedup;\n    std::chrono::duration<double> DedupTime;\n    std::chrono::time_point<std::chrono::high_resolution_clock> startLocalityMatch, endLocalityMatch;\n    std::chrono::duration<double> LocalityMatchTime;\n    std::chrono::time_point<std::chrono::high_resolution_clock> startLocalityDelta, endLocalityDelta;\n    std::chrono::duration<double> LocalityDeltaTime, LocalityDeltaTmp;\n    std::chrono::time_point<std::chrono::high_resolution_clock> startLz4, endLz4;\n    std::chrono::duration<double> lz4CompressionTime;\n    std::chrono::time_point<std::chrono::high_resolution_clock> startFeatureMatch, endFeatureMatch;\n    std::chrono::duration<double> FeatureMatchTime, FeatureMatchTime1;\n    std::chrono::time_point<std::chrono::high_resolution_clock> startFeatureDelta, endFeatureDelta;\n    std::chrono::duration<double> FeatureDeltaTime;\n    std::chrono::duration<double> deltaCompressionTime;\n\n    // index\n    unordered_map<string, int> FPindex; //(fp,chunkid)\n    // 消息队列\n    MessageQueue<Chunk_t> *recieveQueue;\n    // MessageQueue<uint64_t> *MaskRecieveQueue;\n    //  MessageQueue<Chunk_t> *outputMQ_; // to datawrite but not used\n    unordered_map<string, vector<int>> *SFindex;\n    std::chrono::duration<double> getSFTime;\n    uint64_t computeSFtimes = 0;\n    // total\n\n    uint64_t preLogicalchunkiSize = 0;\n    uint64_t logicalchunkSize = 0;\n    uint64_t preuniquechunkSize = 0;\n    uint64_t uniquechunkSize = 0;\n    uint64_t dedupchunkSize = 0;\n    uint64_t basechunkSize = 0;\n    uint64_t basechunkOriSize = 0;\n    uint64_t deltachunkSize = 0;\n    uint64_t deltachunkOriSize = 0;\n    uint64_t finessechunkSize = 0;\n    uint64_t finessePrechunkSize = 0;\n    uint64_t localchunkSize = 0;\n    uint64_t localPrechunkSize = 0;\n\n    uint64_t ContainerNum = 0;\n    uint64_t ContainerSize = 0;\n    // impact reduct\n    uint64_t DedupReduct = 0;\n    // DedupReduct+=tmpChunk.chunkSize;\n    uint64_t DeltaReduct = 0;\n    // DeltaReduct+=tmpChunk.chunkSize-tmpChunk.saveSize;\n    uint64_t LocalReduct = 0;\n    // LocalReduct+=tmpChunk.chunkSize-tmpChunk.saveSize;\n    uint64_t LocalityReduct = 0;\n    uint64_t FeatureReduct = 0;\n    unordered_map<long long> hashTable;\n\n    AbsMethod();\n    ~AbsMethod();\n    void SetFilename(string name);\n    virtual void ProcessTrace() = 0;\n    void SetInputMQ(MessageQueue<Chunk_t> *mq) { recieveQueue = mq; }\n    // void SetInputMaskMQ(MessageQueue<uint64_t> *mq) { MaskRecieveQueue = mq; }\n    //  void SetOutputMQ(MessageQueue<Chunk_t> *outputMQ)\n    //  {\n    //      outputMQ_ = outputMQ;\n    //      return;\n    //  }\n    static bool compareNat(const std::string &a, const std::string &b);\n    void GenerateHash(EVP_MD_CTX *mdCtx, uint8_t *dataBuffer, const int dataSize, uint8_t *hash);\n    int FP_Find(string fp);\n    bool FP_Insert(string fp, int chunkid);\n    void GetSF(unsigned char *ptr, EVP_MD_CTX *mdCtx, uint8_t *SF, int dataSize);\n    int SF_Find(const char *key, size_t keySize);\n    bool SF_Insert(const char *key, size_t keySize, int chunkid);\n    uint8_t *xd3_encode(const uint8_t *targetChunkbuffer, size_t targetChunkbuffer_size, const uint8_t *baseChunkBuffer, size_t baseChunkBuffer_size, size_t *deltaChunkBuffer_size, uint8_t *tmpbuffer);\n    virtual void PrintChunkInfo(string inputDirpath, int chunkingMethod, int method, int fileNum, int64_t time, double ratio);\n    virtual void PrintChunkInfo(string inputDirpath, int chunkingMethod, int method, int fileNum, int64_t time, double ratio, double chunktime);\n    void StatsDelta(Chunk_t &tmpChunk);\n    void StatsDeltaFeature(Chunk_t &tmpChunk);\n    void StatsDeltaLocality(Chunk_t &tmpChunk);\n    virtual void Version_log(double time);\n    virtual void Version_log(double time, double chunktime);\n    void SetTime(std::chrono::time_point<std::chrono::high_resolution_clock> &atime);\n};\n#endif"
+        }
+    ]
+}

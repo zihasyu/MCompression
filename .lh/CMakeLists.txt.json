@@ -1,0 +1,18 @@
+{
+    "sourceFile": "CMakeLists.txt",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1733387197370,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1733387197370,
+            "name": "Commit-0",
+            "content": "# set(CMAKE_BUILD_TYPE \"Release\")\nset(CMAKE_BUILD_TYPE \"Debug\")\ncmake_minimum_required(VERSION 3.1)\nproject(BiSearch)\n\nset(CMAKE_CXX_STANDARD 17)\nset(CMAKE_CXX_STANDARD_REQUIRED TRUE)\nset(CMAKE_VERBOSE_MAKEFILE TRUE)\nset(CMAKE_MODULE_PATH /usr/share/cmake-3.10/Modules/)\n\nset(EXECUTABLE_OUTPUT_PATH ${BiSearch_SOURCE_DIR}/bin)\nset(LIBRARY_OUTPUT_PATH ${BiSearch_SOURCE_DIR}/lib)\n\nset(CMAKE_C_FLAGS_DEBUG \"-O0 -Wall -g -ggdb3\")\nset(CMAKE_CXX_FLAGS_DEBUG \"-O0 -Wall -fsanitize=address -fno-omit-frame-pointer -g -ggdb3\") \nset(CMAKE_C_FLAGS_RELEASE \"-O3 -Wall\") \nset(CMAKE_CXX_FLAGS_RELEASE \"-O3 -Wall\") \n\nset(CMAKE_C_COMPILER \"/usr/bin/clang\")\nset(CMAKE_CXX_COMPILER \"/usr/bin/clang++\")\nset(CMAKE_AR \"/usr/bin/llvm-ar\")\nset(CMAKE_LINKER \"/usr/bin/llvm-ld\")\nset(CMAKE_NM \"/usr/bin/llvm-nm\")\nset(CMAKE_OBJDUMP \"/usr/bin/llvm-objdump\")\nset(CMAKE_RANLIB \"/usr/bin/llvm-ranlib\")\n\nadd_subdirectory(src)"
+        }
+    ]
+}

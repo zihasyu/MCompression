@@ -23,7 +23,7 @@ int main(int argc, char **argv)
     uint32_t backupNum;
     double ratio = 8;
     string dirName;
-    string myName = "BiSearchSystem";
+    string myName = "MC";
 
     vector<string> readfileList;
 
@@ -93,11 +93,6 @@ int main(int argc, char **argv)
         absMethodObj = new Palantir();
         break;
     }
-    case BiSEARCH:
-    {
-        absMethodObj = new BiSearch(ratio);
-        break;
-    }
     case LOCALITY:
     {
         absMethodObj = new LocalDedup();
@@ -149,25 +144,23 @@ int main(int argc, char **argv)
         }
         auto endTmp = std::chrono::high_resolution_clock::now();
         auto TimeTmp = std::chrono::duration_cast<std::chrono::duration<double>>(endTmp - startTmp).count();
-        if (compressionMethod != 5)
-            absMethodObj->Version_log(TimeTmp);
-        else
-            absMethodObj->Version_log(TimeTmp, chunkerObj->ChunkTime.count());
     }
-
-    auto endsum = std::chrono::high_resolution_clock::now();
-    auto sumTime = (endsum - startsum);
-    auto sumTimeInSeconds = std::chrono::duration_cast<std::chrono::seconds>(endsum - startsum).count();
-    std::cout << "Time taken by for loop: " << sumTimeInSeconds << " s " << std::endl;
-    tool::Logging(myName.c_str(), "logical Chunk Num is %d\n", absMethodObj->logicalchunkNum);
-    tool::Logging(myName.c_str(), "unique Chunk Num is %d\n", absMethodObj->uniquechunkNum);
-    tool::Logging(myName.c_str(), "Total logical size is %lu\n", absMethodObj->logicalchunkSize);
-    tool::Logging(myName.c_str(), "Total compressed size is %lu\n", absMethodObj->uniquechunkSize);
-    tool::Logging(myName.c_str(), "Compression ratio is %.4f\n", (double)absMethodObj->logicalchunkSize / (double)absMethodObj->uniquechunkSize);
-    if (compressionMethod != 5)
-        absMethodObj->PrintChunkInfo(dirName, chunkingType, compressionMethod, backupNum, sumTimeInSeconds, ratio);
-    else
-        absMethodObj->PrintChunkInfo(dirName, chunkingType, compressionMethod, backupNum, sumTimeInSeconds, ratio, chunkerObj->ChunkTime.count());
+    absMethodObj->Migratory();
+    absMethodObj->MLC();
+    absMethodObj->OriLC(readfileList[0]);
+    // auto endsum = std::chrono::high_resolution_clock::now();
+    // auto sumTime = (endsum - startsum);
+    // auto sumTimeInSeconds = std::chrono::duration_cast<std::chrono::seconds>(endsum - startsum).count();
+    // std::cout << "Time taken by for loop: " << sumTimeInSeconds << " s " << std::endl;
+    // tool::Logging(myName.c_str(), "logical Chunk Num is %d\n", absMethodObj->logicalchunkNum);
+    // tool::Logging(myName.c_str(), "unique Chunk Num is %d\n", absMethodObj->uniquechunkNum);
+    // tool::Logging(myName.c_str(), "Total logical size is %lu\n", absMethodObj->logicalchunkSize);
+    // tool::Logging(myName.c_str(), "Total compressed size is %lu\n", absMethodObj->uniquechunkSize);
+    // tool::Logging(myName.c_str(), "Compression ratio is %.4f\n", (double)absMethodObj->logicalchunkSize / (double)absMethodObj->uniquechunkSize);
+    // if (compressionMethod != 5)
+    //     absMethodObj->PrintChunkInfo(dirName, chunkingType, compressionMethod, backupNum, sumTimeInSeconds, ratio);
+    // else
+    //     absMethodObj->PrintChunkInfo(dirName, chunkingType, compressionMethod, backupNum, sumTimeInSeconds, ratio, chunkerObj->ChunkTime.count());
 
     //  restore backup if you need, but it's not necessary
     // if (chunkingType != TAR_MultiHeader)
@@ -183,7 +176,7 @@ int main(int argc, char **argv)
     //         absMethodObj->dataWrite_->restoreHeaderFile(readfileList[i]);
     //     }
 
-    string fileName = "C" + to_string(chunkingType) + "_M" + to_string(compressionMethod);
+    // string fileName = "C" + to_string(chunkingType) + "_M" + to_string(compressionMethod);
     // absMethodObj->dataWrite_->Save_to_File_unique(fileName);
     delete absMethodObj->dataWrite_;
     delete chunkerObj;

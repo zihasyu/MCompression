@@ -1,0 +1,94 @@
+{
+    "sourceFile": "src/method/Odess.cc",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 19,
+            "patches": [
+                {
+                    "date": 1733385224693,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1733385407586,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -37,18 +37,18 @@\n         if (recieveQueue->Pop(tmpChunk))\n         {\n             // 计算特征\n             tmpChunkContent.assign((char *)tmpChunk.chunkPtr, tmpChunk.chunkSize);\n-\n+            tmpChunk.chunkID = uniquechunkNum++;\n             // Odess 获取超级特征 & 获取时间\n             startSF = std::chrono::high_resolution_clock::now();\n             auto superfeature = table.feature_generator_.GenerateSuperFeatures(tmpChunkContent);\n             endSF = std::chrono::high_resolution_clock::now();\n             SFTime += (endSF - startSF);\n \n             // 将超级特征的第一个值作为键插入到哈希表中\n-            string firstFeature = superfeature[0];\n-            hashTable.Insert(firstFeature, tmpChunk);\n+            long long firstFeature = superfeature[0];\n+            hashTable.Insert(firstFeature, tmpChunk.chunkID);\n         }\n     }\n     recieveQueue->done_ = false;\n     return;\n"
+                },
+                {
+                    "date": 1733385556611,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -46,9 +46,9 @@\n             SFTime += (endSF - startSF);\n \n             // 将超级特征的第一个值作为键插入到哈希表中\n             long long firstFeature = superfeature[0];\n-            hashTable.Insert(firstFeature, tmpChunk.chunkID);\n+            hashTable.insert({firstFeature, tmpChunk});\n         }\n     }\n     recieveQueue->done_ = false;\n     return;\n"
+                },
+                {
+                    "date": 1733385578088,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -46,9 +46,9 @@\n             SFTime += (endSF - startSF);\n \n             // 将超级特征的第一个值作为键插入到哈希表中\n             long long firstFeature = superfeature[0];\n-            hashTable.insert({firstFeature, tmpChunk});\n+            hashTable.insert({firstFeature, tmpChunk.chunkID});\n         }\n     }\n     recieveQueue->done_ = false;\n     return;\n"
+                },
+                {
+                    "date": 1733385814813,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -52,4 +52,6 @@\n     }\n     recieveQueue->done_ = false;\n     return;\n }\n+\n+void Odess::Migration()\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1733385831718,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -53,5 +53,5 @@\n     recieveQueue->done_ = false;\n     return;\n }\n \n-void Odess::Migration()\n\\ No newline at end of file\n+void Odess::Migratory();\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1733386020896,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -46,12 +46,14 @@\n             SFTime += (endSF - startSF);\n \n             // 将超级特征的第一个值作为键插入到哈希表中\n             long long firstFeature = superfeature[0];\n-            hashTable.insert({firstFeature, tmpChunk.chunkID});\n+            hashTable[firstFeature].push_back(tmpChunk.chunkID);\n         }\n     }\n     recieveQueue->done_ = false;\n     return;\n }\n \n\\ No newline at end of file\n-void Odess::Migratory();\n+void Odess::Migratory()\n+{\n+}\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1733386108183,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -46,14 +46,33 @@\n             SFTime += (endSF - startSF);\n \n             // 将超级特征的第一个值作为键插入到哈希表中\n             long long firstFeature = superfeature[0];\n-            hashTable[firstFeature].push_back(tmpChunk.chunkID);\n+            hashTable[firstFeature].push_back(tmpChunk);\n         }\n     }\n     recieveQueue->done_ = false;\n     return;\n }\n \n void Odess::Migratory()\n {\n+    // 输出到 .me 文件\n+    std::ofstream outputFile(\"output.me\");\n+    if (outputFile.is_open())\n+    {\n+        for (const auto &entry : hashTable)\n+        {\n+            for (const auto &chunk : entry.second)\n+            {\n+                outputFile << \"Chunk ID: \" << chunk.chunkID << std::endl;\n+            }\n+        }\n+        outputFile.close();\n+    }\n+    else\n+    {\n+        std::cerr << \"Unable to open file\";\n+    }\n+\n+    return;\n }\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1733386183632,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -56,16 +56,16 @@\n \n void Odess::Migratory()\n {\n     // 输出到 .me 文件\n-    std::ofstream outputFile(\"output.me\");\n+    std::ofstream outputFile(\"output.me\", std::ios::binary);\n     if (outputFile.is_open())\n     {\n         for (const auto &entry : hashTable)\n         {\n             for (const auto &chunk : entry.second)\n             {\n-                outputFile << \"Chunk ID: \" << chunk.chunkID << std::endl;\n+                outputFile.write(chunk.chunkPtr, chunk.chunkSize);\n             }\n         }\n         outputFile.close();\n     }\n"
+                },
+                {
+                    "date": 1733386215825,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -63,9 +63,9 @@\n         for (const auto &entry : hashTable)\n         {\n             for (const auto &chunk : entry.second)\n             {\n-                outputFile.write(chunk.chunkPtr, chunk.chunkSize);\n+                outputFile.write(reinterpret_cast<const char *>(chunk.chunkPtr), chunk.chunkSize);\n             }\n         }\n         outputFile.close();\n     }\n"
+                },
+                {
+                    "date": 1733386343143,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -74,5 +74,7 @@\n         std::cerr << \"Unable to open file\";\n     }\n \n     return;\n-}\n\\ No newline at end of file\n+}\n+\n+void MLC();\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1733386350670,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -76,5 +76,7 @@\n \n     return;\n }\n \n-void MLC();\n\\ No newline at end of file\n+void Odess::MLC()\n+{\n+}\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1733386475732,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -47,8 +47,9 @@\n \n             // 将超级特征的第一个值作为键插入到哈希表中\n             long long firstFeature = superfeature[0];\n             hashTable[firstFeature].push_back(tmpChunk);\n+            localchunkSize += tmpChunk.chunkSize;\n         }\n     }\n     recieveQueue->done_ = false;\n     return;\n"
+                },
+                {
+                    "date": 1733386576185,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -79,5 +79,32 @@\n }\n \n void Odess::MLC()\n {\n+    // 输出到 .me 文件并进行压缩\n+    std::ofstream outputFile(\"output.me\", std::ios::binary);\n+    if (outputFile.is_open())\n+    {\n+        for (const auto &entry : hashTable)\n+        {\n+            for (const auto &chunk : entry.second)\n+            {\n+                // 分配缓冲区用于压缩\n+                int maxCompressedSize = LZ4_compressBound(chunk.chunkSize);\n+                std::vector<char> lz4ChunkBuffer(maxCompressedSize);\n+\n+                // 进行压缩\n+                int compressedSize = LZ4_compress_fast(reinterpret_cast<const char *>(chunk.chunkPtr), lz4ChunkBuffer.data(), chunk.chunkSize, maxCompressedSize, 3);\n+\n+                // 将压缩后的数据写入文件\n+                outputFile.write(lz4ChunkBuffer.data(), compressedSize);\n+            }\n+        }\n+        outputFile.close();\n+    }\n+    else\n+    {\n+        std::cerr << \"Unable to open file\";\n+    }\n+\n+    return;\n }\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1733386599842,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -80,9 +80,9 @@\n \n void Odess::MLC()\n {\n     // 输出到 .me 文件并进行压缩\n-    std::ofstream outputFile(\"output.me\", std::ios::binary);\n+    std::ofstream outputFile(\"output.me.lz4\", std::ios::binary);\n     if (outputFile.is_open())\n     {\n         for (const auto &entry : hashTable)\n         {\n"
+                },
+                {
+                    "date": 1733386796931,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -79,32 +79,46 @@\n }\n \n void Odess::MLC()\n {\n-    // 输出到 .me 文件并进行压缩\n-    std::ofstream outputFile(\"output.me.lz4\", std::ios::binary);\n-    if (outputFile.is_open())\n+    // 打开输入文件 output.me\n+    std::ifstream inputFile(\"output.me\", std::ios::binary | std::ios::ate);\n+    if (!inputFile.is_open())\n     {\n-        for (const auto &entry : hashTable)\n-        {\n-            for (const auto &chunk : entry.second)\n-            {\n-                // 分配缓冲区用于压缩\n-                int maxCompressedSize = LZ4_compressBound(chunk.chunkSize);\n-                std::vector<char> lz4ChunkBuffer(maxCompressedSize);\n+        std::cerr << \"Unable to open input file\";\n+        return;\n+    }\n \n-                // 进行压缩\n-                int compressedSize = LZ4_compress_fast(reinterpret_cast<const char *>(chunk.chunkPtr), lz4ChunkBuffer.data(), chunk.chunkSize, maxCompressedSize, 3);\n+    // 获取文件大小\n+    std::streamsize inputSize = inputFile.tellg();\n+    inputFile.seekg(0, std::ios::beg);\n \n-                // 将压缩后的数据写入文件\n-                outputFile.write(lz4ChunkBuffer.data(), compressedSize);\n-            }\n-        }\n-        outputFile.close();\n+    // 读取文件内容到缓冲区\n+    std::vector<char> inputBuffer(inputSize);\n+    if (!inputFile.read(inputBuffer.data(), inputSize))\n+    {\n+        std::cerr << \"Error reading input file\";\n+        return;\n     }\n-    else\n+    inputFile.close();\n+\n+    // 分配缓冲区用于压缩\n+    int maxCompressedSize = LZ4_compressBound(inputSize);\n+    std::vector<char> compressedBuffer(maxCompressedSize);\n+\n+    // 进行压缩\n+    int compressedSize = LZ4_compress_fast(inputBuffer.data(), compressedBuffer.data(), inputSize, maxCompressedSize, 3);\n+\n+    // 打开输出文件 output.me.lz4\n+    std::ofstream outputFile(\"output.me.lz4\", std::ios::binary);\n+    if (!outputFile.is_open())\n     {\n-        std::cerr << \"Unable to open file\";\n+        std::cerr << \"Unable to open output file\";\n+        return;\n     }\n \n+    // 将压缩后的数据写入文件\n+    outputFile.write(compressedBuffer.data(), compressedSize);\n+    outputFile.close();\n+\n     return;\n }\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1733389282399,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -62,8 +62,9 @@\n     if (outputFile.is_open())\n     {\n         for (const auto &entry : hashTable)\n         {\n+            std::cout << \"Key: \" << entry.first << \", Vector size: \" << entry.second.size() << std::endl;\n             for (const auto &chunk : entry.second)\n             {\n                 outputFile.write(reinterpret_cast<const char *>(chunk.chunkPtr), chunk.chunkSize);\n             }\n"
+                },
+                {
+                    "date": 1733389327322,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -62,9 +62,10 @@\n     if (outputFile.is_open())\n     {\n         for (const auto &entry : hashTable)\n         {\n-            std::cout << \"Key: \" << entry.first << \", Vector size: \" << entry.second.size() << std::endl;\n+            if (entry.second.size() > 1)\n+                std::cout << \"Key: \" << entry.first << \", Vector size: \" << entry.second.size() << std::endl;\n             for (const auto &chunk : entry.second)\n             {\n                 outputFile.write(reinterpret_cast<const char *>(chunk.chunkPtr), chunk.chunkSize);\n             }\n"
+                },
+                {
+                    "date": 1733389433783,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -66,8 +66,9 @@\n             if (entry.second.size() > 1)\n                 std::cout << \"Key: \" << entry.first << \", Vector size: \" << entry.second.size() << std::endl;\n             for (const auto &chunk : entry.second)\n             {\n+                cout << chunk.chunkID << endl;\n                 outputFile.write(reinterpret_cast<const char *>(chunk.chunkPtr), chunk.chunkSize);\n             }\n         }\n         outputFile.close();\n"
+                },
+                {
+                    "date": 1733389798117,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -17,9 +17,9 @@\n     EVP_MD_CTX_free(mdCtx);\n     free(hashBuf);\n }\n \n-void Odess::ProcessTrace()\n+void Odess::ProcessChunks()\n {\n     string tmpChunkHash;\n     string tmpChunkContent;\n     while (true)\n@@ -27,9 +27,8 @@\n         string hashStr;\n         hashStr.assign(CHUNK_HASH_SIZE, 0);\n         if (recieveQueue->done_ && recieveQueue->IsEmpty())\n         {\n-            // outputMQ_->done_ = true;\n             recieveQueue->done_ = false;\n             ads_Version++;\n             break;\n         }\n@@ -38,22 +37,26 @@\n         {\n             // 计算特征\n             tmpChunkContent.assign((char *)tmpChunk.chunkPtr, tmpChunk.chunkSize);\n             tmpChunk.chunkID = uniquechunkNum++;\n+\n             // Odess 获取超级特征 & 获取时间\n             startSF = std::chrono::high_resolution_clock::now();\n             auto superfeature = table.feature_generator_.GenerateSuperFeatures(tmpChunkContent);\n             endSF = std::chrono::high_resolution_clock::now();\n             SFTime += (endSF - startSF);\n \n             // 将超级特征的第一个值作为键插入到哈希表中\n             long long firstFeature = superfeature[0];\n+            if (hashTable.find(firstFeature) == hashTable.end())\n+            {\n+                insertionOrder.push_back(firstFeature); // 记录插入顺序\n+            }\n             hashTable[firstFeature].push_back(tmpChunk);\n             localchunkSize += tmpChunk.chunkSize;\n         }\n     }\n     recieveQueue->done_ = false;\n-    return;\n }\n \n void Odess::Migratory()\n {\n"
+                }
+            ],
+            "date": 1733385224693,
+            "name": "Commit-0",
+            "content": "#include \"../../include/odess.h\"\n\nOdess::Odess()\n{\n    cout << \" FP size is \" << sizeof(int) << \" Chunk_t is \" << sizeof(Chunk_t) << \" <super_feature_t, unordered_set<string>> is \" << sizeof(super_feature_t);\n    lz4ChunkBuffer = (uint8_t *)malloc(CONTAINER_MAX_SIZE * sizeof(uint8_t));\n    mdCtx = EVP_MD_CTX_new();\n    hashBuf = (uint8_t *)malloc(CHUNK_HASH_SIZE * sizeof(uint8_t));\n    deltaMaxChunkBuffer = (uint8_t *)malloc(2 * CONTAINER_MAX_SIZE * sizeof(uint8_t));\n    SFindex = new unordered_map<string, vector<int>>[FINESSE_SF_NUM];\n}\n\nOdess::~Odess()\n{\n    free(lz4ChunkBuffer);\n    free(deltaMaxChunkBuffer);\n    EVP_MD_CTX_free(mdCtx);\n    free(hashBuf);\n}\n\nvoid Odess::ProcessTrace()\n{\n    string tmpChunkHash;\n    string tmpChunkContent;\n    while (true)\n    {\n        string hashStr;\n        hashStr.assign(CHUNK_HASH_SIZE, 0);\n        if (recieveQueue->done_ && recieveQueue->IsEmpty())\n        {\n            // outputMQ_->done_ = true;\n            recieveQueue->done_ = false;\n            ads_Version++;\n            break;\n        }\n        Chunk_t tmpChunk;\n        if (recieveQueue->Pop(tmpChunk))\n        {\n            // 计算特征\n            tmpChunkContent.assign((char *)tmpChunk.chunkPtr, tmpChunk.chunkSize);\n\n            // Odess 获取超级特征 & 获取时间\n            startSF = std::chrono::high_resolution_clock::now();\n            auto superfeature = table.feature_generator_.GenerateSuperFeatures(tmpChunkContent);\n            endSF = std::chrono::high_resolution_clock::now();\n            SFTime += (endSF - startSF);\n\n            // 将超级特征的第一个值作为键插入到哈希表中\n            string firstFeature = superfeature[0];\n            hashTable.Insert(firstFeature, tmpChunk);\n        }\n    }\n    recieveQueue->done_ = false;\n    return;\n}\n"
+        }
+    ]
+}

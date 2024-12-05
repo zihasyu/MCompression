@@ -54,7 +54,7 @@ public:
     std::chrono::time_point<std::chrono::high_resolution_clock> startLz4, endLz4;
     std::chrono::duration<double> lz4CompressionTime;
     std::chrono::time_point<std::chrono::high_resolution_clock> startFeatureMatch, endFeatureMatch;
-    std::chrono::duration<double> FeatureMatchTime,FeatureMatchTime1;
+    std::chrono::duration<double> FeatureMatchTime, FeatureMatchTime1;
     std::chrono::time_point<std::chrono::high_resolution_clock> startFeatureDelta, endFeatureDelta;
     std::chrono::duration<double> FeatureDeltaTime;
     std::chrono::duration<double> deltaCompressionTime;
@@ -95,11 +95,16 @@ public:
     // LocalReduct+=tmpChunk.chunkSize-tmpChunk.saveSize;
     uint64_t LocalityReduct = 0;
     uint64_t FeatureReduct = 0;
+    map<long long, vector<Chunk_t>> hashTable;
+    std::vector<long long> insertionOrder; // 记录插入顺序的键
 
     AbsMethod();
     ~AbsMethod();
     void SetFilename(string name);
     virtual void ProcessTrace() = 0;
+    virtual void Migratory();
+    virtual void MLC();
+    void OriLC(const std::string &inputFilePath);
     void SetInputMQ(MessageQueue<Chunk_t> *mq) { recieveQueue = mq; }
     // void SetInputMaskMQ(MessageQueue<uint64_t> *mq) { MaskRecieveQueue = mq; }
     //  void SetOutputMQ(MessageQueue<Chunk_t> *outputMQ)
@@ -124,4 +129,5 @@ public:
     virtual void Version_log(double time, double chunktime);
     void SetTime(std::chrono::time_point<std::chrono::high_resolution_clock> &atime);
 };
+
 #endif

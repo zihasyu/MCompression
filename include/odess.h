@@ -26,5 +26,7 @@ public:
     Odess();
     ~Odess();
     void ProcessTrace();
+    virtual void Migratory();
+    virtual void MLC();
 };
 #endif

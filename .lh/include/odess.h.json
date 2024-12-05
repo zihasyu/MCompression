@@ -1,0 +1,30 @@
+{
+    "sourceFile": "include/odess.h",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 3,
+            "patches": [
+                {
+                    "date": 1733385802132,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1733385823790,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -25,7 +25,7 @@\n public:\n     Odess();\n     ~Odess();\n     void ProcessTrace();\n-    void Migration();\n+    void Migratory();\n };\n #endif\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1733386338172,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -26,6 +26,7 @@\n     Odess();\n     ~Odess();\n     void ProcessTrace();\n     void Migratory();\n+    void MLC();\n };\n #endif\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1733387769450,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -25,8 +25,8 @@\n public:\n     Odess();\n     ~Odess();\n     void ProcessTrace();\n-    void Migratory();\n-    void MLC();\n+    virtual void Migratory();\n+    virtual void MLC();\n };\n #endif\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1733385802132,
+            "name": "Commit-0",
+            "content": "/*\n * @Author: Helix0503 834991203@qq.com\n * @Date: 2024-02-02 10:03:53\n * @LastEditors: Helix0503 834991203@qq.com\n * @LastEditTime: 2024-02-02 10:14:13\n * @FilePath: /JunWu/LocalDedupSim/include/localfin.h\n * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE\n */\n#ifndef ODESS_H\n#define ODESS_H\n\n#include \"absmethod.h\"\n#include \"odess_similarity_detection.h\"\n\nusing namespace std;\n\nclass Odess : public AbsMethod\n{\nprivate:\n    string myName_ = \"Odess\";\n    int PrevDedupChunkid = -1;\n    int Version = 0;\n    FeatureIndexTable table;\n\npublic:\n    Odess();\n    ~Odess();\n    void ProcessTrace();\n    void Migration();\n};\n#endif"
+        }
+    ]
+}
