@@ -18,7 +18,7 @@ Odess::~Odess()
     free(hashBuf);
 }
 
-void Odess::ProcessChunks()
+void Odess::ProcessTrace()
 {
     string tmpChunkHash;
     string tmpChunkContent;
@@ -64,13 +64,13 @@ void Odess::Migratory()
     std::ofstream outputFile("output.me", std::ios::binary);
     if (outputFile.is_open())
     {
-        for (const auto &entry : hashTable)
+        for (const auto &key : insertionOrder)
         {
-            if (entry.second.size() > 1)
-                std::cout << "Key: " << entry.first << ", Vector size: " << entry.second.size() << std::endl;
-            for (const auto &chunk : entry.second)
+            const auto &chunks = hashTable[key];
+            std::cout << "Key: " << key << ", Vector size: " << chunks.size() << std::endl;
+            for (const auto &chunk : chunks)
             {
-                cout << chunk.chunkID << endl;
+                std::cout << chunk.chunkID << std::endl;
                 outputFile.write(reinterpret_cast<const char *>(chunk.chunkPtr), chunk.chunkSize);
             }
         }

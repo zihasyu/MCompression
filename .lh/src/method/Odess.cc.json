@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 19,
+            "activePatchIndex": 23,
             "patches": [
                 {
                     "date": 1733385224693,
@@ -84,6 +84,22 @@
                 {
                     "date": 1733389798117,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -17,9 +17,9 @@\n     EVP_MD_CTX_free(mdCtx);\n     free(hashBuf);\n }\n \n-void Odess::ProcessTrace()\n+void Odess::ProcessChunks()\n {\n     string tmpChunkHash;\n     string tmpChunkContent;\n     while (true)\n@@ -27,9 +27,8 @@\n         string hashStr;\n         hashStr.assign(CHUNK_HASH_SIZE, 0);\n         if (recieveQueue->done_ && recieveQueue->IsEmpty())\n         {\n-            // outputMQ_->done_ = true;\n             recieveQueue->done_ = false;\n             ads_Version++;\n             break;\n         }\n@@ -38,22 +37,26 @@\n         {\n             // 计算特征\n             tmpChunkContent.assign((char *)tmpChunk.chunkPtr, tmpChunk.chunkSize);\n             tmpChunk.chunkID = uniquechunkNum++;\n+\n             // Odess 获取超级特征 & 获取时间\n             startSF = std::chrono::high_resolution_clock::now();\n             auto superfeature = table.feature_generator_.GenerateSuperFeatures(tmpChunkContent);\n             endSF = std::chrono::high_resolution_clock::now();\n             SFTime += (endSF - startSF);\n \n             // 将超级特征的第一个值作为键插入到哈希表中\n             long long firstFeature = superfeature[0];\n+            if (hashTable.find(firstFeature) == hashTable.end())\n+            {\n+                insertionOrder.push_back(firstFeature); // 记录插入顺序\n+            }\n             hashTable[firstFeature].push_back(tmpChunk);\n             localchunkSize += tmpChunk.chunkSize;\n         }\n     }\n     recieveQueue->done_ = false;\n-    return;\n }\n \n void Odess::Migratory()\n {\n"
+                },
+                {
+                    "date": 1733389857018,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -17,9 +17,9 @@\n     EVP_MD_CTX_free(mdCtx);\n     free(hashBuf);\n }\n \n-void Odess::ProcessChunks()\n+void Odess::ProcessTrace()\n {\n     string tmpChunkHash;\n     string tmpChunkContent;\n     while (true)\n"
+                },
+                {
+                    "date": 1733389864445,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -63,15 +63,15 @@\n     // 输出到 .me 文件\n     std::ofstream outputFile(\"output.me\", std::ios::binary);\n     if (outputFile.is_open())\n     {\n-        for (const auto &entry : hashTable)\n+        for (const auto &key : insertionOrder)\n         {\n-            if (entry.second.size() > 1)\n-                std::cout << \"Key: \" << entry.first << \", Vector size: \" << entry.second.size() << std::endl;\n-            for (const auto &chunk : entry.second)\n+            const auto &chunks = hashTable[key];\n+            std::cout << \"Key: \" << key << \", Vector size: \" << chunks.size() << std::endl;\n+            for (const auto &chunk : chunks)\n             {\n-                cout << chunk.chunkID << endl;\n+                std::cout << chunk.chunkID << std::endl;\n                 outputFile.write(reinterpret_cast<const char *>(chunk.chunkPtr), chunk.chunkSize);\n             }\n         }\n         outputFile.close();\n"
+                },
+                {
+                    "date": 1733390051208,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -111,9 +111,9 @@\n     int maxCompressedSize = LZ4_compressBound(inputSize);\n     std::vector<char> compressedBuffer(maxCompressedSize);\n \n     // 进行压缩\n-    int compressedSize = LZ4_compress_fast(inputBuffer.data(), compressedBuffer.data(), inputSize, maxCompressedSize, 3);\n+    int compressedSize = LZ4_compress_fast(inputBuffer.data(), compressedBuffer.data(), inputSize, maxCompressedSize, 9);\n \n     // 打开输出文件 output.me.lz4\n     std::ofstream outputFile(\"output.me.lz4\", std::ios::binary);\n     if (!outputFile.is_open())\n"
+                },
+                {
+                    "date": 1733390129674,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -111,9 +111,9 @@\n     int maxCompressedSize = LZ4_compressBound(inputSize);\n     std::vector<char> compressedBuffer(maxCompressedSize);\n \n     // 进行压缩\n-    int compressedSize = LZ4_compress_fast(inputBuffer.data(), compressedBuffer.data(), inputSize, maxCompressedSize, 9);\n+    int compressedSize = LZ4_compress_fast(inputBuffer.data(), compressedBuffer.data(), inputSize, maxCompressedSize, 3);\n \n     // 打开输出文件 output.me.lz4\n     std::ofstream outputFile(\"output.me.lz4\", std::ios::binary);\n     if (!outputFile.is_open())\n"
                 }
             ],
             "date": 1733385224693,

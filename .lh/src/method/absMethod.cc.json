@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 8,
+            "activePatchIndex": 10,
             "patches": [
                 {
                     "date": 1733387028836,
@@ -40,6 +40,14 @@
                 {
                     "date": 1733388138392,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -594,9 +594,9 @@\n     // 进行压缩\n     int compressedSize = LZ4_compress_fast(inputBuffer.data(), compressedBuffer.data(), inputSize, maxCompressedSize, 3);\n \n     // 构造输出文件路径\n-    std::string outputFilePath = inputFilePath + \".lz4\";\n+    std::string outputFilePath = \"ori.lz4\";\n \n     // 打开输出文件\n     std::ofstream outputFile(outputFilePath, std::ios::binary);\n     if (!outputFile.is_open())\n"
+                },
+                {
+                    "date": 1733390071542,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -591,9 +591,9 @@\n     int maxCompressedSize = LZ4_compressBound(inputSize);\n     std::vector<char> compressedBuffer(maxCompressedSize);\n \n     // 进行压缩\n-    int compressedSize = LZ4_compress_fast(inputBuffer.data(), compressedBuffer.data(), inputSize, maxCompressedSize, 3);\n+    int compressedSize = LZ4_compress_fast(inputBuffer.data(), compressedBuffer.data(), inputSize, maxCompressedSize, 9);\n \n     // 构造输出文件路径\n     std::string outputFilePath = \"ori.lz4\";\n \n"
+                },
+                {
+                    "date": 1733390127833,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -591,9 +591,9 @@\n     int maxCompressedSize = LZ4_compressBound(inputSize);\n     std::vector<char> compressedBuffer(maxCompressedSize);\n \n     // 进行压缩\n-    int compressedSize = LZ4_compress_fast(inputBuffer.data(), compressedBuffer.data(), inputSize, maxCompressedSize, 9);\n+    int compressedSize = LZ4_compress_fast(inputBuffer.data(), compressedBuffer.data(), inputSize, maxCompressedSize, 3);\n \n     // 构造输出文件路径\n     std::string outputFilePath = \"ori.lz4\";\n \n"
                 }
             ],
             "date": 1733387028836,
