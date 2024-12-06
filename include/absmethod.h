@@ -97,7 +97,8 @@ public:
     uint64_t FeatureReduct = 0;
     map<long long, vector<Chunk_t>> hashTable;
     std::vector<long long> insertionOrder; // 记录插入顺序的键
-
+    uint64_t oriLCSize = 0;
+    uint64_t MLCSize = 0;
     AbsMethod();
     ~AbsMethod();
     void SetFilename(string name);
@@ -106,6 +107,7 @@ public:
     virtual void MLC();
     void OriGenerate(std::vector<std::string> readfileList, int backupNum);
     void OriLC(const std::string &inputFilePath);
+    uint64_t CompressLargeFile(const std::string &inputFilePath, const std::string &outputFilePath);
     void SetInputMQ(MessageQueue<Chunk_t> *mq) { recieveQueue = mq; }
     // void SetInputMaskMQ(MessageQueue<uint64_t> *mq) { MaskRecieveQueue = mq; }
     //  void SetOutputMQ(MessageQueue<Chunk_t> *outputMQ)

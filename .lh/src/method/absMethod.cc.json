@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 15,
+            "activePatchIndex": 35,
             "patches": [
                 {
                     "date": 1733387028836,
@@ -68,6 +68,86 @@
                 {
                     "date": 1733452677268,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -573,11 +573,18 @@\n         std::cerr << \"Unable to open output file: ori\" << std::endl;\n         return;\n     }\n \n+    int count = 0;\n+\n     // 遍历 readfileList 中的每个文件路径\n     for (const auto &filePath : readfileList)\n     {\n+        if (count >= backupNum)\n+        {\n+            break;\n+        }\n+\n         // 打开输入文件\n         std::ifstream inputFile(filePath, std::ios::binary | std::ios::ate);\n         if (!inputFile.is_open())\n         {\n@@ -600,8 +607,10 @@\n         inputFile.close();\n \n         // 将缓冲区内容写入输出文件\n         outputFile.write(inputBuffer.data(), inputSize);\n+\n+        count++;\n     }\n \n     outputFile.close();\n     std::cout << \"Files have been successfully merged into 'ori'.\" << std::endl;\n"
+                },
+                {
+                    "date": 1733454011590,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -643,12 +643,12 @@\n     std::vector<char> compressedBuffer(maxCompressedSize);\n \n     // 进行压缩\n     int compressedSize = LZ4_compress_fast(inputBuffer.data(), compressedBuffer.data(), inputSize, maxCompressedSize, 3);\n+    oriLCSize = compressedSize\n+        // 构造输出文件路径\n+        std::string outputFilePath = \"ori.lz4\";\n \n-    // 构造输出文件路径\n-    std::string outputFilePath = \"ori.lz4\";\n-\n     // 打开输出文件\n     std::ofstream outputFile(outputFilePath, std::ios::binary);\n     if (!outputFile.is_open())\n     {\n"
+                },
+                {
+                    "date": 1733454018982,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -643,11 +643,11 @@\n     std::vector<char> compressedBuffer(maxCompressedSize);\n \n     // 进行压缩\n     int compressedSize = LZ4_compress_fast(inputBuffer.data(), compressedBuffer.data(), inputSize, maxCompressedSize, 3);\n-    oriLCSize = compressedSize\n-        // 构造输出文件路径\n-        std::string outputFilePath = \"ori.lz4\";\n+    oriLCSize = compressedSize;\n+    // 构造输出文件路径\n+    std::string outputFilePath = \"ori.lz4\";\n \n     // 打开输出文件\n     std::ofstream outputFile(outputFilePath, std::ios::binary);\n     if (!outputFile.is_open())\n"
+                },
+                {
+                    "date": 1733454561755,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -612,9 +612,9 @@\n         count++;\n     }\n \n     outputFile.close();\n-    std::cout << \"Files have been successfully merged into 'ori'.\" << std::endl;\n+    // std::cout << \"Files have been successfully merged into 'ori'.\" << std::endl;\n }\n void AbsMethod::OriLC(const std::string &inputFilePath)\n {\n     // 打开输入文件\n"
+                },
+                {
+                    "date": 1733454856105,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -659,8 +659,8 @@\n     // 将压缩后的数据写入文件\n     outputFile.write(compressedBuffer.data(), compressedSize);\n     outputFile.close();\n \n-    std::cout << \"Compression successful. Output file: \" << outputFilePath << std::endl;\n+    // std::cout << \"Compression successful. Output file: \" << outputFilePath << std::endl;\n \n     return;\n }\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1733456095186,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -662,5 +662,52 @@\n \n     // std::cout << \"Compression successful. Output file: \" << outputFilePath << std::endl;\n \n     return;\n+}\n+\n+void CompressLargeFile(const std::string &inputFilePath, const std::string &outputFilePath, int blockSize)\n+{\n+    // 打开输入文件\n+    std::ifstream inputFile(inputFilePath, std::ios::binary);\n+    if (!inputFile.is_open())\n+    {\n+        std::cerr << \"Unable to open input file: \" << inputFilePath << std::endl;\n+        return;\n+    }\n+\n+    // 打开输出文件\n+    std::ofstream outputFile(outputFilePath, std::ios::binary);\n+    if (!outputFile.is_open())\n+    {\n+        std::cerr << \"Unable to open output file: \" << outputFilePath << std::endl;\n+        return;\n+    }\n+\n+    std::vector<char> inputBuffer(blockSize);\n+    std::vector<char> compressedBuffer(LZ4_compressBound(blockSize));\n+\n+    while (inputFile)\n+    {\n+        // 读取一个块\n+        inputFile.read(inputBuffer.data(), blockSize);\n+        std::streamsize bytesRead = inputFile.gcount();\n+        if (bytesRead == 0)\n+            break;\n+\n+        // 压缩块\n+        int compressedSize = LZ4_compress_fast(inputBuffer.data(), compressedBuffer.data(), bytesRead, compressedBuffer.size(), 1);\n+        if (compressedSize <= 0)\n+        {\n+            std::cerr << \"Compression failed\" << std::endl;\n+            return;\n+        }\n+\n+        // 写入压缩块大小\n+        outputFile.write(reinterpret_cast<const char *>(&compressedSize), sizeof(compressedSize));\n+        // 写入压缩数据\n+        outputFile.write(compressedBuffer.data(), compressedSize);\n+    }\n+\n+    inputFile.close();\n+    outputFile.close();\n }\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1733456104295,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -664,9 +664,9 @@\n \n     return;\n }\n \n-void CompressLargeFile(const std::string &inputFilePath, const std::string &outputFilePath, int blockSize)\n+void AbsMethod::CompressLargeFile(const std::string &inputFilePath, const std::string &outputFilePath, int blockSize)\n {\n     // 打开输入文件\n     std::ifstream inputFile(inputFilePath, std::ios::binary);\n     if (!inputFile.is_open())\n"
+                },
+                {
+                    "date": 1733463084945,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -664,10 +664,11 @@\n \n     return;\n }\n \n-void AbsMethod::CompressLargeFile(const std::string &inputFilePath, const std::string &outputFilePath, int blockSize)\n+void AbsMethod::CompressLargeFile(const std::string &inputFilePath, const std::string &outputFilePath)\n {\n+    int blockSize = 1024 * 1024;\n     // 打开输入文件\n     std::ifstream inputFile(inputFilePath, std::ios::binary);\n     if (!inputFile.is_open())\n     {\n"
+                },
+                {
+                    "date": 1733463099245,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -666,9 +666,9 @@\n }\n \n void AbsMethod::CompressLargeFile(const std::string &inputFilePath, const std::string &outputFilePath)\n {\n-    int blockSize = 1024 * 1024;\n+    int blockSize = 16 * 1024 * 1024;\n     // 打开输入文件\n     std::ifstream inputFile(inputFilePath, std::ios::binary);\n     if (!inputFile.is_open())\n     {\n"
+                },
+                {
+                    "date": 1733463115496,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -666,9 +666,9 @@\n }\n \n void AbsMethod::CompressLargeFile(const std::string &inputFilePath, const std::string &outputFilePath)\n {\n-    int blockSize = 16 * 1024 * 1024;\n+    int blockSize = 4 * 1024 * 1024;\n     // 打开输入文件\n     std::ifstream inputFile(inputFilePath, std::ios::binary);\n     if (!inputFile.is_open())\n     {\n"
+                },
+                {
+                    "date": 1733463177062,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -642,13 +642,14 @@\n     int maxCompressedSize = LZ4_compressBound(inputSize);\n     std::vector<char> compressedBuffer(maxCompressedSize);\n \n     // 进行压缩\n+\n     int compressedSize = LZ4_compress_fast(inputBuffer.data(), compressedBuffer.data(), inputSize, maxCompressedSize, 3);\n     oriLCSize = compressedSize;\n     // 构造输出文件路径\n     std::string outputFilePath = \"ori.lz4\";\n-\n+    CompressLargeFile(inputFilePath, outputFilePath);\n     // 打开输出文件\n     std::ofstream outputFile(outputFilePath, std::ios::binary);\n     if (!outputFile.is_open())\n     {\n"
+                },
+                {
+                    "date": 1733463237229,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -665,11 +665,12 @@\n \n     return;\n }\n \n-void AbsMethod::CompressLargeFile(const std::string &inputFilePath, const std::string &outputFilePath)\n+uint64_t AbsMethod::CompressLargeFile(const std::string &inputFilePath, const std::string &outputFilePath)\n {\n     int blockSize = 4 * 1024 * 1024;\n+    uint64_t ans = 0;\n     // 打开输入文件\n     std::ifstream inputFile(inputFilePath, std::ios::binary);\n     if (!inputFile.is_open())\n     {\n"
+                },
+                {
+                    "date": 1733463247011,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -703,8 +703,9 @@\n         {\n             std::cerr << \"Compression failed\" << std::endl;\n             return;\n         }\n+        ans += compressedSize;\n \n         // 写入压缩块大小\n         outputFile.write(reinterpret_cast<const char *>(&compressedSize), sizeof(compressedSize));\n         // 写入压缩数据\n"
+                },
+                {
+                    "date": 1733463257581,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -701,9 +701,9 @@\n         int compressedSize = LZ4_compress_fast(inputBuffer.data(), compressedBuffer.data(), bytesRead, compressedBuffer.size(), 1);\n         if (compressedSize <= 0)\n         {\n             std::cerr << \"Compression failed\" << std::endl;\n-            return;\n+            return 0;\n         }\n         ans += compressedSize;\n \n         // 写入压缩块大小\n@@ -713,5 +713,6 @@\n     }\n \n     inputFile.close();\n     outputFile.close();\n+    return ans;\n }\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1733463325969,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -618,34 +618,8 @@\n void AbsMethod::OriLC(const std::string &inputFilePath)\n {\n     // 打开输入文件\n     std::ifstream inputFile(inputFilePath, std::ios::binary | std::ios::ate);\n-    if (!inputFile.is_open())\n-    {\n-        std::cerr << \"Unable to open input file: \" << inputFilePath << std::endl;\n-        return;\n-    }\n-\n-    // 获取文件大小\n-    std::streamsize inputSize = inputFile.tellg();\n-    inputFile.seekg(0, std::ios::beg);\n-\n-    // 读取文件内容到缓冲区\n-    std::vector<char> inputBuffer(inputSize);\n-    if (!inputFile.read(inputBuffer.data(), inputSize))\n-    {\n-        std::cerr << \"Error reading input file: \" << inputFilePath << std::endl;\n-        return;\n-    }\n-    inputFile.close();\n-\n-    // 分配缓冲区用于压缩\n-    int maxCompressedSize = LZ4_compressBound(inputSize);\n-    std::vector<char> compressedBuffer(maxCompressedSize);\n-\n-    // 进行压缩\n-\n-    int compressedSize = LZ4_compress_fast(inputBuffer.data(), compressedBuffer.data(), inputSize, maxCompressedSize, 3);\n     oriLCSize = compressedSize;\n     // 构造输出文件路径\n     std::string outputFilePath = \"ori.lz4\";\n     CompressLargeFile(inputFilePath, outputFilePath);\n"
+                },
+                {
+                    "date": 1733463332928,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -618,12 +618,11 @@\n void AbsMethod::OriLC(const std::string &inputFilePath)\n {\n     // 打开输入文件\n     std::ifstream inputFile(inputFilePath, std::ios::binary | std::ios::ate);\n-    oriLCSize = compressedSize;\n     // 构造输出文件路径\n     std::string outputFilePath = \"ori.lz4\";\n-    CompressLargeFile(inputFilePath, outputFilePath);\n+    oriLCSize = CompressLargeFile(inputFilePath, outputFilePath);\n     // 打开输出文件\n     std::ofstream outputFile(outputFilePath, std::ios::binary);\n     if (!outputFile.is_open())\n     {\n"
+                },
+                {
+                    "date": 1733463373704,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -621,22 +621,9 @@\n     std::ifstream inputFile(inputFilePath, std::ios::binary | std::ios::ate);\n     // 构造输出文件路径\n     std::string outputFilePath = \"ori.lz4\";\n     oriLCSize = CompressLargeFile(inputFilePath, outputFilePath);\n-    // 打开输出文件\n-    std::ofstream outputFile(outputFilePath, std::ios::binary);\n-    if (!outputFile.is_open())\n-    {\n-        std::cerr << \"Unable to open output file: \" << outputFilePath << std::endl;\n-        return;\n-    }\n-\n-    // 将压缩后的数据写入文件\n-    outputFile.write(compressedBuffer.data(), compressedSize);\n-    outputFile.close();\n-\n     // std::cout << \"Compression successful. Output file: \" << outputFilePath << std::endl;\n-\n     return;\n }\n \n uint64_t AbsMethod::CompressLargeFile(const std::string &inputFilePath, const std::string &outputFilePath)\n"
+                },
+                {
+                    "date": 1733463506817,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -616,11 +616,8 @@\n     // std::cout << \"Files have been successfully merged into 'ori'.\" << std::endl;\n }\n void AbsMethod::OriLC(const std::string &inputFilePath)\n {\n-    // 打开输入文件\n-    std::ifstream inputFile(inputFilePath, std::ios::binary | std::ios::ate);\n-    // 构造输出文件路径\n     std::string outputFilePath = \"ori.lz4\";\n     oriLCSize = CompressLargeFile(inputFilePath, outputFilePath);\n     // std::cout << \"Compression successful. Output file: \" << outputFilePath << std::endl;\n     return;\n"
+                },
+                {
+                    "date": 1733463530869,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -624,9 +624,9 @@\n }\n \n uint64_t AbsMethod::CompressLargeFile(const std::string &inputFilePath, const std::string &outputFilePath)\n {\n-    int blockSize = 4 * 1024 * 1024;\n+    int blockSize = 128 * 1024 * 1024;\n     uint64_t ans = 0;\n     // 打开输入文件\n     std::ifstream inputFile(inputFilePath, std::ios::binary);\n     if (!inputFile.is_open())\n"
+                },
+                {
+                    "date": 1733463576610,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -631,17 +631,17 @@\n     std::ifstream inputFile(inputFilePath, std::ios::binary);\n     if (!inputFile.is_open())\n     {\n         std::cerr << \"Unable to open input file: \" << inputFilePath << std::endl;\n-        return;\n+        return 0;\n     }\n \n     // 打开输出文件\n     std::ofstream outputFile(outputFilePath, std::ios::binary);\n     if (!outputFile.is_open())\n     {\n         std::cerr << \"Unable to open output file: \" << outputFilePath << std::endl;\n-        return;\n+        return 0;\n     }\n \n     std::vector<char> inputBuffer(blockSize);\n     std::vector<char> compressedBuffer(LZ4_compressBound(blockSize));\n"
+                },
+                {
+                    "date": 1733463672636,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -654,9 +654,9 @@\n         if (bytesRead == 0)\n             break;\n \n         // 压缩块\n-        int compressedSize = LZ4_compress_fast(inputBuffer.data(), compressedBuffer.data(), bytesRead, compressedBuffer.size(), 1);\n+        int compressedSize = LZ4_compress_fast(inputBuffer.data(), compressedBuffer.data(), bytesRead, compressedBuffer.size(), 3);\n         if (compressedSize <= 0)\n         {\n             std::cerr << \"Compression failed\" << std::endl;\n             return 0;\n"
                 }
             ],
             "date": 1733387028836,

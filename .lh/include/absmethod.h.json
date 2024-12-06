@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 19,
+            "activePatchIndex": 25,
             "patches": [
                 {
                     "date": 1733385470535,
@@ -84,6 +84,30 @@
                 {
                     "date": 1733452586725,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -103,9 +103,9 @@\n     void SetFilename(string name);\n     virtual void ProcessTrace() = 0;\n     virtual void Migratory();\n     virtual void MLC();\n-    void OriGenerate(std::vector<std::string> readfileList);\n+    void OriGenerate(std::vector<std::string> readfileList, int backupNum);\n     void OriLC(const std::string &inputFilePath);\n     void SetInputMQ(MessageQueue<Chunk_t> *mq) { recieveQueue = mq; }\n     // void SetInputMaskMQ(MessageQueue<uint64_t> *mq) { MaskRecieveQueue = mq; }\n     //  void SetOutputMQ(MessageQueue<Chunk_t> *outputMQ)\n"
+                },
+                {
+                    "date": 1733453987004,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -96,9 +96,9 @@\n     uint64_t LocalityReduct = 0;\n     uint64_t FeatureReduct = 0;\n     map<long long, vector<Chunk_t>> hashTable;\n     std::vector<long long> insertionOrder; // 记录插入顺序的键\n-\n+    int oriLCSize = 0;\n     AbsMethod();\n     ~AbsMethod();\n     void SetFilename(string name);\n     virtual void ProcessTrace() = 0;\n"
+                },
+                {
+                    "date": 1733454043821,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -97,8 +97,9 @@\n     uint64_t FeatureReduct = 0;\n     map<long long, vector<Chunk_t>> hashTable;\n     std::vector<long long> insertionOrder; // 记录插入顺序的键\n     int oriLCSize = 0;\n+    int MLCSize = 0;\n     AbsMethod();\n     ~AbsMethod();\n     void SetFilename(string name);\n     virtual void ProcessTrace() = 0;\n"
+                },
+                {
+                    "date": 1733456133626,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -106,8 +106,9 @@\n     virtual void Migratory();\n     virtual void MLC();\n     void OriGenerate(std::vector<std::string> readfileList, int backupNum);\n     void OriLC(const std::string &inputFilePath);\n+    void CompressLargeFile(const std::string &inputFilePath, const std::string &outputFilePath, int blockSize);\n     void SetInputMQ(MessageQueue<Chunk_t> *mq) { recieveQueue = mq; }\n     // void SetInputMaskMQ(MessageQueue<uint64_t> *mq) { MaskRecieveQueue = mq; }\n     //  void SetOutputMQ(MessageQueue<Chunk_t> *outputMQ)\n     //  {\n"
+                },
+                {
+                    "date": 1733463110105,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -106,9 +106,9 @@\n     virtual void Migratory();\n     virtual void MLC();\n     void OriGenerate(std::vector<std::string> readfileList, int backupNum);\n     void OriLC(const std::string &inputFilePath);\n-    void CompressLargeFile(const std::string &inputFilePath, const std::string &outputFilePath, int blockSize);\n+    void CompressLargeFile(const std::string &inputFilePath, const std::string &outputFilePath);\n     void SetInputMQ(MessageQueue<Chunk_t> *mq) { recieveQueue = mq; }\n     // void SetInputMaskMQ(MessageQueue<uint64_t> *mq) { MaskRecieveQueue = mq; }\n     //  void SetOutputMQ(MessageQueue<Chunk_t> *outputMQ)\n     //  {\n"
+                },
+                {
+                    "date": 1733463199884,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -106,9 +106,9 @@\n     virtual void Migratory();\n     virtual void MLC();\n     void OriGenerate(std::vector<std::string> readfileList, int backupNum);\n     void OriLC(const std::string &inputFilePath);\n-    void CompressLargeFile(const std::string &inputFilePath, const std::string &outputFilePath);\n+    uint64_t CompressLargeFile(const std::string &inputFilePath, const std::string &outputFilePath);\n     void SetInputMQ(MessageQueue<Chunk_t> *mq) { recieveQueue = mq; }\n     // void SetInputMaskMQ(MessageQueue<uint64_t> *mq) { MaskRecieveQueue = mq; }\n     //  void SetOutputMQ(MessageQueue<Chunk_t> *outputMQ)\n     //  {\n"
+                },
+                {
+                    "date": 1733465236695,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -96,10 +96,10 @@\n     uint64_t LocalityReduct = 0;\n     uint64_t FeatureReduct = 0;\n     map<long long, vector<Chunk_t>> hashTable;\n     std::vector<long long> insertionOrder; // 记录插入顺序的键\n-    int oriLCSize = 0;\n-    int MLCSize = 0;\n+    uint64_t oriLCSize = 0;\n+    uint64_t MLCSize = 0;\n     AbsMethod();\n     ~AbsMethod();\n     void SetFilename(string name);\n     virtual void ProcessTrace() = 0;\n"
                 }
             ],
             "date": 1733385470535,

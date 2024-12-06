@@ -153,7 +153,13 @@ int main(int argc, char **argv)
     // auto sumTime = (endsum - startsum);
     // auto sumTimeInSeconds = std::chrono::duration_cast<std::chrono::seconds>(endsum - startsum).count();
     // std::cout << "Time taken by for loop: " << sumTimeInSeconds << " s " << std::endl;
-    // tool::Logging(myName.c_str(), "logical Chunk Num is %d\n", absMethodObj->logicalchunkNum);
+    std::cout << " -i " << dirName << " -c " << chunkingType << " -m " << compressionMethod << " -n " << backupNum << endl;
+    std::cout << "logical size : " << absMethodObj->logicalchunkSize << std::endl;
+    std::cout << "Ori lossless compression size : " << absMethodObj->oriLCSize << std::endl;
+    std::cout << "Migratory lossless compression size : " << absMethodObj->MLCSize << std::endl;
+    std::cout << "Ori lossless compression ratio: " << (double)absMethodObj->logicalchunkSize / (double)absMethodObj->oriLCSize << std::endl;
+    std::cout << "Migration lossless compression ratio: " << (double)absMethodObj->logicalchunkSize / (double)absMethodObj->MLCSize << std::endl;
+    std::cout << "improve ratio: " << ((double)absMethodObj->oriLCSize / (double)absMethodObj->MLCSize - 1) * 100 << "%" << std::endl;
     // tool::Logging(myName.c_str(), "unique Chunk Num is %d\n", absMethodObj->uniquechunkNum);
     // tool::Logging(myName.c_str(), "Total logical size is %lu\n", absMethodObj->logicalchunkSize);
     // tool::Logging(myName.c_str(), "Total compressed size is %lu\n", absMethodObj->uniquechunkSize);
@@ -161,7 +167,7 @@ int main(int argc, char **argv)
     // if (compressionMethod != 5)
     //     absMethodObj->PrintChunkInfo(dirName, chunkingType, compressionMethod, backupNum, sumTimeInSeconds, ratio);
     // else
-    //     absMethodObj->PrintChunkInfo(dirName, chunkingType, compressionMethod, backupNum, sumTimeInSeconds, ratio, chunkerObj->ChunkTime.count());
+    // absMethodObj->PrintChunkInfo(dirName, chunkingType, compressionMethod, backupNum, sumTimeInSeconds, ratio, chunkerObj->ChunkTime.count());
 
     //  restore backup if you need, but it's not necessary
     // if (chunkingType != TAR_MultiHeader)

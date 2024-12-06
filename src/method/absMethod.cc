@@ -613,54 +613,63 @@ void AbsMethod::OriGenerate(std::vector<std::string> readfileList, int backupNum
     }
 
     outputFile.close();
-    std::cout << "Files have been successfully merged into 'ori'." << std::endl;
+    // std::cout << "Files have been successfully merged into 'ori'." << std::endl;
 }
 void AbsMethod::OriLC(const std::string &inputFilePath)
 {
+    std::string outputFilePath = "ori.lz4";
+    oriLCSize = CompressLargeFile(inputFilePath, outputFilePath);
+    // std::cout << "Compression successful. Output file: " << outputFilePath << std::endl;
+    return;
+}
+
+uint64_t AbsMethod::CompressLargeFile(const std::string &inputFilePath, const std::string &outputFilePath)
+{
+    int blockSize = 128 * 1024 * 1024;
+    uint64_t ans = 0;
     // 打开输入文件
-    std::ifstream inputFile(inputFilePath, std::ios::binary | std::ios::ate);
+    std::ifstream inputFile(inputFilePath, std::ios::binary);
     if (!inputFile.is_open())
     {
         std::cerr << "Unable to open input file: " << inputFilePath << std::endl;
-        return;
+        return 0;
     }
-
-    // 获取文件大小
-    std::streamsize inputSize = inputFile.tellg();
-    inputFile.seekg(0, std::ios::beg);
-
-    // 读取文件内容到缓冲区
-    std::vector<char> inputBuffer(inputSize);
-    if (!inputFile.read(inputBuffer.data(), inputSize))
-    {
-        std::cerr << "Error reading input file: " << inputFilePath << std::endl;
-        return;
-    }
-    inputFile.close();
-
-    // 分配缓冲区用于压缩
-    int maxCompressedSize = LZ4_compressBound(inputSize);
-    std::vector<char> compressedBuffer(maxCompressedSize);
-
-    // 进行压缩
-    int compressedSize = LZ4_compress_fast(inputBuffer.data(), compressedBuffer.data(), inputSize, maxCompressedSize, 3);
-
-    // 构造输出文件路径
-    std::string outputFilePath = "ori.lz4";
 
     // 打开输出文件
     std::ofstream outputFile(outputFilePath, std::ios::binary);
     if (!outputFile.is_open())
     {
         std::cerr << "Unable to open output file: " << outputFilePath << std::endl;
-        return;
+        return 0;
     }
 
-    // 将压缩后的数据写入文件
-    outputFile.write(compressedBuffer.data(), compressedSize);
+    std::vector<char> inputBuffer(blockSize);
+    std::vector<char> compressedBuffer(LZ4_compressBound(blockSize));
+
+    while (inputFile)
+    {
+        // 读取一个块
+        inputFile.read(inputBuffer.data(), blockSize);
+        std::streamsize bytesRead = inputFile.gcount();
+        if (bytesRead == 0)
+            break;
+
+        // 压缩块
+        int compressedSize = LZ4_compress_fast(inputBuffer.data(), compressedBuffer.data(), bytesRead, compressedBuffer.size(), 3);
+        if (compressedSize <= 0)
+        {
+            std::cerr << "Compression failed" << std::endl;
+            return 0;
+        }
+        ans += compressedSize;
+
+        // 写入压缩块大小
+        outputFile.write(reinterpret_cast<const char *>(&compressedSize), sizeof(compressedSize));
+        // 写入压缩数据
+        outputFile.write(compressedBuffer.data(), compressedSize);
+    }
+
+    inputFile.close();
     outputFile.close();
-
-    std::cout << "Compression successful. Output file: " << outputFilePath << std::endl;
-
-    return;
+    return ans;
 }

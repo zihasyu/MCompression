@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 23,
+            "activePatchIndex": 31,
             "patches": [
                 {
                     "date": 1733385224693,
@@ -100,6 +100,38 @@
                 {
                     "date": 1733390129674,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -111,9 +111,9 @@\n     int maxCompressedSize = LZ4_compressBound(inputSize);\n     std::vector<char> compressedBuffer(maxCompressedSize);\n \n     // 进行压缩\n-    int compressedSize = LZ4_compress_fast(inputBuffer.data(), compressedBuffer.data(), inputSize, maxCompressedSize, 9);\n+    int compressedSize = LZ4_compress_fast(inputBuffer.data(), compressedBuffer.data(), inputSize, maxCompressedSize, 3);\n \n     // 打开输出文件 output.me.lz4\n     std::ofstream outputFile(\"output.me.lz4\", std::ios::binary);\n     if (!outputFile.is_open())\n"
+                },
+                {
+                    "date": 1733453039138,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -66,9 +66,9 @@\n     {\n         for (const auto &key : insertionOrder)\n         {\n             const auto &chunks = hashTable[key];\n-            std::cout << \"Key: \" << key << \", Vector size: \" << chunks.size() << std::endl;\n+            // std::cout << \"Key: \" << key << \", Vector size: \" << chunks.size() << std::endl;\n             for (const auto &chunk : chunks)\n             {\n                 std::cout << chunk.chunkID << std::endl;\n                 outputFile.write(reinterpret_cast<const char *>(chunk.chunkPtr), chunk.chunkSize);\n"
+                },
+                {
+                    "date": 1733454067312,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -112,9 +112,9 @@\n     std::vector<char> compressedBuffer(maxCompressedSize);\n \n     // 进行压缩\n     int compressedSize = LZ4_compress_fast(inputBuffer.data(), compressedBuffer.data(), inputSize, maxCompressedSize, 3);\n-\n+    MLCSize = compressedSize;\n     // 打开输出文件 output.me.lz4\n     std::ofstream outputFile(\"output.me.lz4\", std::ios::binary);\n     if (!outputFile.is_open())\n     {\n"
+                },
+                {
+                    "date": 1733454496714,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -37,9 +37,9 @@\n         {\n             // 计算特征\n             tmpChunkContent.assign((char *)tmpChunk.chunkPtr, tmpChunk.chunkSize);\n             tmpChunk.chunkID = uniquechunkNum++;\n-\n+            logicalchunkSize += tmpChunk.chunkSize;\n             // Odess 获取超级特征 & 获取时间\n             startSF = std::chrono::high_resolution_clock::now();\n             auto superfeature = table.feature_generator_.GenerateSuperFeatures(tmpChunkContent);\n             endSF = std::chrono::high_resolution_clock::now();\n"
+                },
+                {
+                    "date": 1733454537856,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -69,9 +69,9 @@\n             const auto &chunks = hashTable[key];\n             // std::cout << \"Key: \" << key << \", Vector size: \" << chunks.size() << std::endl;\n             for (const auto &chunk : chunks)\n             {\n-                std::cout << chunk.chunkID << std::endl;\n+                // std::cout << chunk.chunkID << std::endl;\n                 outputFile.write(reinterpret_cast<const char *>(chunk.chunkPtr), chunk.chunkSize);\n             }\n         }\n         outputFile.close();\n"
+                },
+                {
+                    "date": 1733454731790,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,9 +1,9 @@\n #include \"../../include/odess.h\"\n \n Odess::Odess()\n {\n-    cout << \" FP size is \" << sizeof(int) << \" Chunk_t is \" << sizeof(Chunk_t) << \" <super_feature_t, unordered_set<string>> is \" << sizeof(super_feature_t);\n+    // cout << \" FP size is \" << sizeof(int) << \" Chunk_t is \" << sizeof(Chunk_t) << \" <super_feature_t, unordered_set<string>> is \" << sizeof(super_feature_t);\n     lz4ChunkBuffer = (uint8_t *)malloc(CONTAINER_MAX_SIZE * sizeof(uint8_t));\n     mdCtx = EVP_MD_CTX_new();\n     hashBuf = (uint8_t *)malloc(CHUNK_HASH_SIZE * sizeof(uint8_t));\n     deltaMaxChunkBuffer = (uint8_t *)malloc(2 * CONTAINER_MAX_SIZE * sizeof(uint8_t));\n"
+                },
+                {
+                    "date": 1733463455881,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -112,9 +112,9 @@\n     std::vector<char> compressedBuffer(maxCompressedSize);\n \n     // 进行压缩\n     int compressedSize = LZ4_compress_fast(inputBuffer.data(), compressedBuffer.data(), inputSize, maxCompressedSize, 3);\n-    MLCSize = compressedSize;\n+    MLCSize = CompressLargeFile(\"output.me\", \"output.me.lz4\");\n     // 打开输出文件 output.me.lz4\n     std::ofstream outputFile(\"output.me.lz4\", std::ios::binary);\n     if (!outputFile.is_open())\n     {\n"
+                },
+                {
+                    "date": 1733463471062,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -85,46 +85,8 @@\n }\n \n void Odess::MLC()\n {\n-    // 打开输入文件 output.me\n-    std::ifstream inputFile(\"output.me\", std::ios::binary | std::ios::ate);\n-    if (!inputFile.is_open())\n-    {\n-        std::cerr << \"Unable to open input file\";\n-        return;\n-    }\n-\n-    // 获取文件大小\n-    std::streamsize inputSize = inputFile.tellg();\n-    inputFile.seekg(0, std::ios::beg);\n-\n-    // 读取文件内容到缓冲区\n-    std::vector<char> inputBuffer(inputSize);\n-    if (!inputFile.read(inputBuffer.data(), inputSize))\n-    {\n-        std::cerr << \"Error reading input file\";\n-        return;\n-    }\n-    inputFile.close();\n-\n-    // 分配缓冲区用于压缩\n-    int maxCompressedSize = LZ4_compressBound(inputSize);\n-    std::vector<char> compressedBuffer(maxCompressedSize);\n-\n-    // 进行压缩\n     int compressedSize = LZ4_compress_fast(inputBuffer.data(), compressedBuffer.data(), inputSize, maxCompressedSize, 3);\n     MLCSize = CompressLargeFile(\"output.me\", \"output.me.lz4\");\n-    // 打开输出文件 output.me.lz4\n-    std::ofstream outputFile(\"output.me.lz4\", std::ios::binary);\n-    if (!outputFile.is_open())\n-    {\n-        std::cerr << \"Unable to open output file\";\n-        return;\n-    }\n-\n-    // 将压缩后的数据写入文件\n-    outputFile.write(compressedBuffer.data(), compressedSize);\n-    outputFile.close();\n-\n     return;\n }\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1733463493314,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -85,8 +85,7 @@\n }\n \n void Odess::MLC()\n {\n-    int compressedSize = LZ4_compress_fast(inputBuffer.data(), compressedBuffer.data(), inputSize, maxCompressedSize, 3);\n     MLCSize = CompressLargeFile(\"output.me\", \"output.me.lz4\");\n     return;\n }\n\\ No newline at end of file\n"
                 }
             ],
             "date": 1733385224693,

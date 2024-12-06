@@ -154,7 +154,7 @@ void Chunker::Chunking()
                 break;
             }
             chunk.chunkPtr = (uint8_t *)malloc(cp);
-            cout << "cp is " << cp << endl;
+            // cout << "cp is " << cp << endl;
             memcpy(chunk.chunkPtr, readFileBuffer + localOffset, cp);
             chunk.chunkSize = cp;
             // chunk.chunkID = chunkID++;太早了
