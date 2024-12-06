@@ -564,6 +564,57 @@ void AbsMethod::Version_log(double time, double chunktime)
 }
 void AbsMethod::Migratory() {};
 void AbsMethod::MLC() {};
+void AbsMethod::OriGenerate(std::vector<std::string> readfileList, int backupNum)
+{
+    // 打开输出文件 ori
+    std::ofstream outputFile("ori", std::ios::binary);
+    if (!outputFile.is_open())
+    {
+        std::cerr << "Unable to open output file: ori" << std::endl;
+        return;
+    }
+
+    int count = 0;
+
+    // 遍历 readfileList 中的每个文件路径
+    for (const auto &filePath : readfileList)
+    {
+        if (count >= backupNum)
+        {
+            break;
+        }
+
+        // 打开输入文件
+        std::ifstream inputFile(filePath, std::ios::binary | std::ios::ate);
+        if (!inputFile.is_open())
+        {
+            std::cerr << "Unable to open input file: " << filePath << std::endl;
+            continue;
+        }
+
+        // 获取文件大小
+        std::streamsize inputSize = inputFile.tellg();
+        inputFile.seekg(0, std::ios::beg);
+
+        // 读取文件内容到缓冲区
+        std::vector<char> inputBuffer(inputSize);
+        if (!inputFile.read(inputBuffer.data(), inputSize))
+        {
+            std::cerr << "Error reading input file: " << filePath << std::endl;
+            inputFile.close();
+            continue;
+        }
+        inputFile.close();
+
+        // 将缓冲区内容写入输出文件
+        outputFile.write(inputBuffer.data(), inputSize);
+
+        count++;
+    }
+
+    outputFile.close();
+    std::cout << "Files have been successfully merged into 'ori'." << std::endl;
+}
 void AbsMethod::OriLC(const std::string &inputFilePath)
 {
     // 打开输入文件

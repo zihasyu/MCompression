@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 15,
+            "activePatchIndex": 19,
             "patches": [
                 {
                     "date": 1733385470535,
@@ -68,6 +68,22 @@
                 {
                     "date": 1733389781958,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -95,8 +95,9 @@\n     // LocalReduct+=tmpChunk.chunkSize-tmpChunk.saveSize;\n     uint64_t LocalityReduct = 0;\n     uint64_t FeatureReduct = 0;\n     map<long long, vector<Chunk_t>> hashTable;\n+    std::vector<long long> insertionOrder; // 记录插入顺序的键\n \n     AbsMethod();\n     ~AbsMethod();\n     void SetFilename(string name);\n"
+                },
+                {
+                    "date": 1733452226484,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -103,8 +103,9 @@\n     void SetFilename(string name);\n     virtual void ProcessTrace() = 0;\n     virtual void Migratory();\n     virtual void MLC();\n+    void OriGenerate(const std::string &inputFilePath);\n     void OriLC(const std::string &inputFilePath);\n     void SetInputMQ(MessageQueue<Chunk_t> *mq) { recieveQueue = mq; }\n     // void SetInputMaskMQ(MessageQueue<uint64_t> *mq) { MaskRecieveQueue = mq; }\n     //  void SetOutputMQ(MessageQueue<Chunk_t> *outputMQ)\n"
+                },
+                {
+                    "date": 1733452310101,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -103,10 +103,10 @@\n     void SetFilename(string name);\n     virtual void ProcessTrace() = 0;\n     virtual void Migratory();\n     virtual void MLC();\n-    void OriGenerate(const std::string &inputFilePath);\n-    void OriLC(const std::string &inputFilePath);\n+    void OriGenerate(std::vector<std::string> readfileList);\n+    void OriLC(std::vector<std::string> readfileList);\n     void SetInputMQ(MessageQueue<Chunk_t> *mq) { recieveQueue = mq; }\n     // void SetInputMaskMQ(MessageQueue<uint64_t> *mq) { MaskRecieveQueue = mq; }\n     //  void SetOutputMQ(MessageQueue<Chunk_t> *outputMQ)\n     //  {\n"
+                },
+                {
+                    "date": 1733452359226,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -104,9 +104,9 @@\n     virtual void ProcessTrace() = 0;\n     virtual void Migratory();\n     virtual void MLC();\n     void OriGenerate(std::vector<std::string> readfileList);\n-    void OriLC(std::vector<std::string> readfileList);\n+    void OriLC(const std::string &inputFilePath);\n     void SetInputMQ(MessageQueue<Chunk_t> *mq) { recieveQueue = mq; }\n     // void SetInputMaskMQ(MessageQueue<uint64_t> *mq) { MaskRecieveQueue = mq; }\n     //  void SetOutputMQ(MessageQueue<Chunk_t> *outputMQ)\n     //  {\n"
+                },
+                {
+                    "date": 1733452586725,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -103,9 +103,9 @@\n     void SetFilename(string name);\n     virtual void ProcessTrace() = 0;\n     virtual void Migratory();\n     virtual void MLC();\n-    void OriGenerate(std::vector<std::string> readfileList);\n+    void OriGenerate(std::vector<std::string> readfileList, int backupNum);\n     void OriLC(const std::string &inputFilePath);\n     void SetInputMQ(MessageQueue<Chunk_t> *mq) { recieveQueue = mq; }\n     // void SetInputMaskMQ(MessageQueue<uint64_t> *mq) { MaskRecieveQueue = mq; }\n     //  void SetOutputMQ(MessageQueue<Chunk_t> *outputMQ)\n"
                 }
             ],
             "date": 1733385470535,

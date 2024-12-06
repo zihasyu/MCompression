@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 10,
+            "activePatchIndex": 15,
             "patches": [
                 {
                     "date": 1733387028836,
@@ -48,6 +48,26 @@
                 {
                     "date": 1733390127833,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -591,9 +591,9 @@\n     int maxCompressedSize = LZ4_compressBound(inputSize);\n     std::vector<char> compressedBuffer(maxCompressedSize);\n \n     // 进行压缩\n-    int compressedSize = LZ4_compress_fast(inputBuffer.data(), compressedBuffer.data(), inputSize, maxCompressedSize, 9);\n+    int compressedSize = LZ4_compress_fast(inputBuffer.data(), compressedBuffer.data(), inputSize, maxCompressedSize, 3);\n \n     // 构造输出文件路径\n     std::string outputFilePath = \"ori.lz4\";\n \n"
+                },
+                {
+                    "date": 1733452260051,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -563,8 +563,11 @@\n     preSFTime = SFTime;\n }\n void AbsMethod::Migratory() {};\n void AbsMethod::MLC() {};\n+void AbsMethod::OriGenerate(const std::string &inputFilePath) {\n+\n+};\n void AbsMethod::OriLC(const std::string &inputFilePath)\n {\n     // 打开输入文件\n     std::ifstream inputFile(inputFilePath, std::ios::binary | std::ios::ate);\n"
+                },
+                {
+                    "date": 1733452372941,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -563,9 +563,9 @@\n     preSFTime = SFTime;\n }\n void AbsMethod::Migratory() {};\n void AbsMethod::MLC() {};\n-void AbsMethod::OriGenerate(const std::string &inputFilePath) {\n+void AbsMethod::OriGenerate(std::vector<std::string> readfileList) {\n \n };\n void AbsMethod::OriLC(const std::string &inputFilePath)\n {\n"
+                },
+                {
+                    "date": 1733452447509,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -563,11 +563,50 @@\n     preSFTime = SFTime;\n }\n void AbsMethod::Migratory() {};\n void AbsMethod::MLC() {};\n-void AbsMethod::OriGenerate(std::vector<std::string> readfileList) {\n+void AbsMethod::OriGenerate(std::vector<std::string> readfileList)\n+{\n+    // 打开输出文件 ori\n+    std::ofstream outputFile(\"ori\", std::ios::binary);\n+    if (!outputFile.is_open())\n+    {\n+        std::cerr << \"Unable to open output file: ori\" << std::endl;\n+        return;\n+    }\n \n-};\n+    // 遍历 readfileList 中的每个文件路径\n+    for (const auto &filePath : readfileList)\n+    {\n+        // 打开输入文件\n+        std::ifstream inputFile(filePath, std::ios::binary | std::ios::ate);\n+        if (!inputFile.is_open())\n+        {\n+            std::cerr << \"Unable to open input file: \" << filePath << std::endl;\n+            continue;\n+        }\n+\n+        // 获取文件大小\n+        std::streamsize inputSize = inputFile.tellg();\n+        inputFile.seekg(0, std::ios::beg);\n+\n+        // 读取文件内容到缓冲区\n+        std::vector<char> inputBuffer(inputSize);\n+        if (!inputFile.read(inputBuffer.data(), inputSize))\n+        {\n+            std::cerr << \"Error reading input file: \" << filePath << std::endl;\n+            inputFile.close();\n+            continue;\n+        }\n+        inputFile.close();\n+\n+        // 将缓冲区内容写入输出文件\n+        outputFile.write(inputBuffer.data(), inputSize);\n+    }\n+\n+    outputFile.close();\n+    std::cout << \"Files have been successfully merged into 'ori'.\" << std::endl;\n+}\n void AbsMethod::OriLC(const std::string &inputFilePath)\n {\n     // 打开输入文件\n     std::ifstream inputFile(inputFilePath, std::ios::binary | std::ios::ate);\n"
+                },
+                {
+                    "date": 1733452595204,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -563,9 +563,9 @@\n     preSFTime = SFTime;\n }\n void AbsMethod::Migratory() {};\n void AbsMethod::MLC() {};\n-void AbsMethod::OriGenerate(std::vector<std::string> readfileList)\n+void AbsMethod::OriGenerate(std::vector<std::string> readfileList, int backupNum)\n {\n     // 打开输出文件 ori\n     std::ofstream outputFile(\"ori\", std::ios::binary);\n     if (!outputFile.is_open())\n"
+                },
+                {
+                    "date": 1733452677268,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -573,11 +573,18 @@\n         std::cerr << \"Unable to open output file: ori\" << std::endl;\n         return;\n     }\n \n+    int count = 0;\n+\n     // 遍历 readfileList 中的每个文件路径\n     for (const auto &filePath : readfileList)\n     {\n+        if (count >= backupNum)\n+        {\n+            break;\n+        }\n+\n         // 打开输入文件\n         std::ifstream inputFile(filePath, std::ios::binary | std::ios::ate);\n         if (!inputFile.is_open())\n         {\n@@ -600,8 +607,10 @@\n         inputFile.close();\n \n         // 将缓冲区内容写入输出文件\n         outputFile.write(inputBuffer.data(), inputSize);\n+\n+        count++;\n     }\n \n     outputFile.close();\n     std::cout << \"Files have been successfully merged into 'ori'.\" << std::endl;\n"
                 }
             ],
             "date": 1733387028836,

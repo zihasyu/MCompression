@@ -147,7 +147,8 @@ int main(int argc, char **argv)
     }
     absMethodObj->Migratory();
     absMethodObj->MLC();
-    absMethodObj->OriLC(readfileList[0]);
+    absMethodObj->OriGenerate(readfileList, backupNum);
+    absMethodObj->OriLC("ori");
     // auto endsum = std::chrono::high_resolution_clock::now();
     // auto sumTime = (endsum - startsum);
     // auto sumTimeInSeconds = std::chrono::duration_cast<std::chrono::seconds>(endsum - startsum).count();

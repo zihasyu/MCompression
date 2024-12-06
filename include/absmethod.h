@@ -104,6 +104,7 @@ public:
     virtual void ProcessTrace() = 0;
     virtual void Migratory();
     virtual void MLC();
+    void OriGenerate(std::vector<std::string> readfileList, int backupNum);
     void OriLC(const std::string &inputFilePath);
     void SetInputMQ(MessageQueue<Chunk_t> *mq) { recieveQueue = mq; }
     // void SetInputMaskMQ(MessageQueue<uint64_t> *mq) { MaskRecieveQueue = mq; }

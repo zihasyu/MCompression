@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 4,
+            "activePatchIndex": 7,
             "patches": [
                 {
                     "date": 1733384965800,
@@ -24,6 +24,18 @@
                 {
                     "date": 1733388283114,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -146,9 +146,9 @@\n         auto TimeTmp = std::chrono::duration_cast<std::chrono::duration<double>>(endTmp - startTmp).count();\n     }\n     absMethodObj->Migratory();\n     absMethodObj->MLC();\n-    absMethodObj->OriLC(dirName);\n+    absMethodObj->OriLC(readfileList[0]);\n     // auto endsum = std::chrono::high_resolution_clock::now();\n     // auto sumTime = (endsum - startsum);\n     // auto sumTimeInSeconds = std::chrono::duration_cast<std::chrono::seconds>(endsum - startsum).count();\n     // std::cout << \"Time taken by for loop: \" << sumTimeInSeconds << \" s \" << std::endl;\n"
+                },
+                {
+                    "date": 1733452470212,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -146,9 +146,9 @@\n         auto TimeTmp = std::chrono::duration_cast<std::chrono::duration<double>>(endTmp - startTmp).count();\n     }\n     absMethodObj->Migratory();\n     absMethodObj->MLC();\n-    absMethodObj->OriLC(readfileList[0]);\n+    absMethodObj->OriLC(\"ori\");\n     // auto endsum = std::chrono::high_resolution_clock::now();\n     // auto sumTime = (endsum - startsum);\n     // auto sumTimeInSeconds = std::chrono::duration_cast<std::chrono::seconds>(endsum - startsum).count();\n     // std::cout << \"Time taken by for loop: \" << sumTimeInSeconds << \" s \" << std::endl;\n"
+                },
+                {
+                    "date": 1733452476331,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -146,8 +146,9 @@\n         auto TimeTmp = std::chrono::duration_cast<std::chrono::duration<double>>(endTmp - startTmp).count();\n     }\n     absMethodObj->Migratory();\n     absMethodObj->MLC();\n+    absMethodObj->OriGenerate(readfileList);\n     absMethodObj->OriLC(\"ori\");\n     // auto endsum = std::chrono::high_resolution_clock::now();\n     // auto sumTime = (endsum - startsum);\n     // auto sumTimeInSeconds = std::chrono::duration_cast<std::chrono::seconds>(endsum - startsum).count();\n"
+                },
+                {
+                    "date": 1733452708952,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -146,9 +146,9 @@\n         auto TimeTmp = std::chrono::duration_cast<std::chrono::duration<double>>(endTmp - startTmp).count();\n     }\n     absMethodObj->Migratory();\n     absMethodObj->MLC();\n-    absMethodObj->OriGenerate(readfileList);\n+    absMethodObj->OriGenerate(readfileList, backupNum);\n     absMethodObj->OriLC(\"ori\");\n     // auto endsum = std::chrono::high_resolution_clock::now();\n     // auto sumTime = (endsum - startsum);\n     // auto sumTimeInSeconds = std::chrono::duration_cast<std::chrono::seconds>(endsum - startsum).count();\n"
                 }
             ],
             "date": 1733384965800,
