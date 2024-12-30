@@ -40,6 +40,7 @@ void Chunker::ChunkerInit()
 {
     switch (chunkType)
     {
+    case MTAR:
     case FIXED_SIZE:
     {
         // fixed size chunking]
@@ -47,7 +48,6 @@ void Chunker::ChunkerInit()
         chunkBuffer = (uint8_t *)malloc(FixedChunkSize);
         break;
     }
-    case MTAR:
 
     case FASTCDC: // FastCDC chunking
     {

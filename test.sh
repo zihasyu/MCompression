@@ -1,31 +1,34 @@
 cd bin
-method=3
+method=1
 chunking=0
 num=1
-# name=LKT
-# ./BiSearch -i /mnt/dataset2/$name -c $chunking -m $method -n $num 
+# Instructions=BiSearch
+Instructions=Delta
+name=LKT
+./$Instructions -i /mnt/dataset2/$name -c $chunking -m $method -n $num 
 
-# name=WEB
-# ./BiSearch -i /mnt/dataset2/$name -c $chunking -m $method -n $num 
+name=WEB
+./$Instructions -i /mnt/dataset2/$name -c $chunking -m $method -n $num 
 
-# name=chromium
-# ./BiSearch -i /mnt/dataset2/$name -c $chunking -m $method -n $num
+name=chromium
+./$Instructions -i /mnt/dataset2/$name -c $chunking -m $method -n $num
 
-name=ThunderbirdTar
-./BiSearch -i /mnt/dataset2/$name -c $chunking -m $method -n $num
+name=CentOS
+./$Instructions -i /home/public/SXL/data/dataGeneration/multiuser_modifications -c $chunking -m $method -n $num
+
 num=2
 
-# name=LKT
-# ./BiSearch -i /mnt/dataset2/$name -c $chunking -m $method -n $num 
+name=LKT
+./$Instructions -i /mnt/dataset2/$name -c $chunking -m $method -n $num 
 
-# name=WEB
-# ./BiSearch -i /mnt/dataset2/$name -c $chunking -m $method -n $num 
+name=WEB
+./$Instructions -i /mnt/dataset2/$name -c $chunking -m $method -n $num 
 
-# name=chromium
-# ./BiSearch -i /mnt/dataset2/$name -c $chunking -m $method -n $num
+name=chromium
+./$Instructions -i /mnt/dataset2/$name -c $chunking -m $method -n $num
 
-name=ThunderbirdTar
-./BiSearch -i /mnt/dataset2/$name -c $chunking -m $method -n $num
+name=CentOS
+./$Instructions -i /home/public/SXL/data/dataGeneration/multiuser_modifications -c $chunking -m $method -n $num
 
 # name=LKT
 # num=2

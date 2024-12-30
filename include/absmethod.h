@@ -20,6 +20,7 @@ class AbsMethod
 {
 protected:
 public:
+    Chunker chunker_;
     int ads_Version = 0;
     // util
     string filename;
@@ -131,6 +132,7 @@ public:
     virtual void Version_log(double time);
     virtual void Version_log(double time, double chunktime);
     void SetTime(std::chrono::time_point<std::chrono::high_resolution_clock> &atime);
+    void ThirdCutPointHashMin(const uint8_t *src, const uint64_t len, uint64_t &start, uint64_t &end);
 };
 
 #endif

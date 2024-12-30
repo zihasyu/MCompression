@@ -57,7 +57,12 @@ void NTransForm::ProcessTrace()
 
                 vector<uint64_t> sf(3);
                 startSF = std::chrono::high_resolution_clock::now();
-                auto ret = ntrans.getFeatureList(tmpChunk.chunkPtr, tmpChunk.chunkSize, fealist, sf);
+                uint64_t start = 0, end = 0;
+                ThirdCutPointHashMin(tmpChunk.chunkPtr, tmpChunk.chunkSize, start, end);
+                // auto ret = ntrans.getFeatureList(tmpChunk.chunkPtr, tmpChunk.chunkSize, fealist, sf);
+                // cout << "start is " << start << " end is " << end << endl;
+                // cout << " end - start is " << end - start << endl;
+                auto ret = ntrans.getFeatureList(tmpChunk.chunkPtr + start, end - start, fealist, sf);
                 endSF = std::chrono::high_resolution_clock::now();
                 SFTime += (endSF - startSF);
 

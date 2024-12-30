@@ -1,7 +1,9 @@
 #include "../../include/absmethod.h"
 
-AbsMethod::AbsMethod()
+AbsMethod::AbsMethod() : chunker_(1)
 {
+    chunker_.changeChunkSize(4096);
+    chunker_.ChunkerInit();
     mdCtx = EVP_MD_CTX_new();
     hashBuf = (uint8_t *)malloc(CHUNK_HASH_SIZE * sizeof(uint8_t));
 }
@@ -672,4 +674,30 @@ uint64_t AbsMethod::CompressLargeFile(const std::string &inputFilePath, const st
     inputFile.close();
     outputFile.close();
     return ans;
+}
+void AbsMethod::ThirdCutPointHashMin(const uint8_t *src, const uint64_t len, uint64_t &start, uint64_t &end)
+{
+    std::vector<uint64_t> cutPoints;
+    uint64_t offset = 0;
+    uint64_t maxCutPoint = 0;
+    uint64_t maxCutPointStart = 0;
+
+    while (offset < len)
+    {
+        uint64_t cp = chunker_.CutPointFastCDC(src + offset, len - offset);
+        cutPoints.push_back(cp);
+        if (cp > maxCutPoint)
+        {
+            maxCutPoint = cp;
+            maxCutPointStart = offset;
+            //(src+maxCutPointStart -> src+maxCutPointStart+maxCutPoint) is ChunkInChunk
+        }
+        offset += cp;
+    }
+    start = maxCutPointStart;
+    end = maxCutPointStart + maxCutPoint;
+    if (start == 0 && end == 0)
+    {
+        cout << "error:start is 0 " << "end :" << end << endl;
+    }
 }

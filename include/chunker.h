@@ -30,6 +30,9 @@ private:
     uint64_t minChunkSize = 4096;
     uint64_t avgChunkSize = 8192;
     uint64_t maxChunkSize = 16384;
+    // uint64_t minChunkSize = 4096 / 2;
+    // uint64_t avgChunkSize = 4096;
+    // uint64_t maxChunkSize = 8192;
     uint64_t normalSize;
     uint32_t bits;
     uint32_t maskS;
@@ -102,5 +105,11 @@ public:
     uint64_t Big_Chunk_Offset = 0;    // CutPointTarFast
     long sameCount = 0;
     uint64_t recipeSegCount = 0;
+    void changeChunkSize(int size)
+    {
+        minChunkSize = size / 2;
+        avgChunkSize = size;
+        maxChunkSize = size * 2;
+    };
 };
 #endif
